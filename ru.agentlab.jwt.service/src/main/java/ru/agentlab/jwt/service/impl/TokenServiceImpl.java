@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.ParseException;
+import java.util.Date;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
@@ -28,6 +29,7 @@ import com.nimbusds.jose.proc.JWSVerificationKeySelector;
 import com.nimbusds.jose.proc.SecurityContext;
 import com.nimbusds.jose.util.Resource;
 import com.nimbusds.jose.util.ResourceRetriever;
+import com.nimbusds.jwt.SignedJWT;
 import com.nimbusds.jwt.proc.ConfigurableJWTProcessor;
 import com.nimbusds.jwt.proc.DefaultJWTProcessor;
 
@@ -60,6 +62,25 @@ public class TokenServiceImpl implements IJwtService {
         } catch (ParseException | BadJOSEException | JOSEException e) {
             throw new JwtException(e.getMessage(), e);
         }
+        return true;
+    }
+
+    @Override
+    public boolean isExpired(String jwt) throws JwtException {
+
+        if (Strings.isNullOrEmpty(jwt)) {
+            throw new JwtException("Empty token");
+        }
+
+        try {
+            SignedJWT signedJWT = SignedJWT.parse(preProcessToken(jwt));
+            if (new Date().before(signedJWT.getJWTClaimsSet().getExpirationTime())) {
+                return false;
+            }
+        } catch (ParseException e) {
+            throw new JwtException(e.getMessage(), e);
+        }
+
         return true;
     }
 

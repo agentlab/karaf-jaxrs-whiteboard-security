@@ -20,6 +20,8 @@ import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -33,6 +35,8 @@ import ru.agentlab.security.TokenPayload;
 
 @Component
 public class SecurityServiceImpl implements ISecurityService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(SecurityServiceImpl.class);
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
@@ -62,6 +66,16 @@ public class SecurityServiceImpl implements ISecurityService {
 
         BearerToken token = new BearerToken(accessToken);
         SecurityUtils.getSubject().login(token);
+    }
+
+    public boolean isTokenExpired(String accessToken) {
+        Preconditions.checkArgument(accessToken != null);
+        try {
+            return jwtService.isExpired(accessToken);
+        } catch (JwtException e) {
+            LOGGER.error(e.getMessage(), e);
+        }
+        return true;
     }
 
     private class BearerRealm extends AuthorizingRealm {

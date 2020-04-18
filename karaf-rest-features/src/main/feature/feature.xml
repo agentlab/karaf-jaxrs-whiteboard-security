@@ -14,38 +14,21 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.4.0">
 
-    <repository>mvn:org.apache.aries.jax.rs/org.apache.aries.jax.rs.features/1.0.6/xml
+    <repository>mvn:org.apache.aries.jax.rs/org.apache.aries.jax.rs.features/${aries.whiteboard.version}/xml
     </repository>
 
-    <feature name="karaf-rest-whiteboard" version="${project.version}">
-        <feature>http-whiteboard</feature>
-        <feature>aries-jax-rs-whiteboard</feature>
-        <feature>aries-jax-rs-whiteboard-jackson</feature>
-        <bundle dependency="true">mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jaxws-api-2.2/${servicemix-spec.version} </bundle>
-        <bundle dependency="true">mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.saaj-api-1.3/${servicemix-spec.version} </bundle>
-        <bundle>mvn:ru.agentlab/karaf-rest-whiteboard/${project.version} </bundle>
-        <bundle>mvn:ru.agentlab/ru.agentlab.cors/${project.version} </bundle>
-        <bundle>mvn:ru.agentlab/ru.agentlab.jwt.service/${project.version} </bundle>
-        <bundle>mvn:ru.agentlab/ru.agentlab.oauth/${project.version} </bundle>
-        <bundle>mvn:ru.agentlab/ru.agentlab.oauth.commons/${project.version} </bundle>
-
-        <bundle>mvn:ru.agentlab/ru.agentlab.security/${project.version} </bundle>
-
-
-        <!-- jackson -->
-        <bundle dependency="true">mvn:com.fasterxml.jackson.core/jackson-core/${jackson.version} </bundle>
-        <bundle dependency="true">mvn:com.fasterxml.jackson.core/jackson-databind/${jackson.version} </bundle>
-        <bundle dependency="true">mvn:com.fasterxml.jackson.core/jackson-annotations/${jackson.version} </bundle>
+    <feature version="${aries.whiteboard.version}" name="agentlab-aries-jax-rs-whiteboard-jackson">
+        <bundle dependency="true">mvn:com.fasterxml.jackson.core/jackson-core/${jackson.version}</bundle>
+        <bundle dependency="true">mvn:com.fasterxml.jackson.core/jackson-annotations/${jackson.version}</bundle>
+        <bundle dependency="true">mvn:com.fasterxml.jackson.core/jackson-databind/${jackson.version}</bundle>
+        <bundle dependency="true">mvn:com.fasterxml.jackson.jaxrs/jackson-jaxrs-base/${jackson.version}</bundle>
+        <bundle dependency="true">mvn:com.fasterxml.jackson.jaxrs/jackson-jaxrs-json-provider/${jackson.version}</bundle>
+        <bundle dependency="true">mvn:com.fasterxml.jackson.module/jackson-module-jaxb-annotations/${jackson.version}</bundle>
         <bundle dependency="true">mvn:com.fasterxml.jackson.datatype/jackson-datatype-jdk8/${jackson.version} </bundle>
+        <bundle>mvn:org.apache.aries.jax.rs/org.apache.aries.jax.rs.jackson/1.0.2</bundle>
+    </feature>
 
-        <bundle dependency="true">mvn:org.apache.commons/commons-lang3/${apache.commons-lang3.version} </bundle>
-
-        <bundle dependency="true">mvn:com.google.guava/guava/${guava.version} </bundle>
-
-        <bundle dependency="true">wrap:mvn:org.apache.httpcomponents/httpclient/${apache.httpclient.version} </bundle>
-
-        <bundle dependency="true">wrap:mvn:org.apache.httpcomponents/httpcore/${apache.httpcore.version} </bundle>
-
+    <feature version="${project.version}" name="nimbus-oauth-sdk">
         <bundle dependency="true">mvn:com.nimbusds/nimbus-jose-jwt/${nimbus-jose-jwt.version} </bundle>
 
         <bundle dependency="true">wrap:mvn:net.jcip/jcip-annotations/${jcip-annotations.version}</bundle>
@@ -58,6 +41,25 @@
         <bundle dependency="true">mvn:com.nimbusds/oauth2-oidc-sdk/${oauth2-oidc-sdk.version} </bundle>
         <bundle dependency="true">mvn:com.nimbusds/lang-tag/${com.nimbusds.lang-tag.version} </bundle>
         <bundle dependency="true">mvn:javax.mail/javax.mail-api/${javax.mail-api.version} </bundle>
+    </feature>
+
+    <feature version="${project.version}" name="ru.agentlab.security.deps">
+        <feature>http-whiteboard</feature>
+        <feature>aries-jax-rs-whiteboard</feature>
+        <feature>aries-jax-rs-whiteboard-jackson</feature>
+
+        <feature>agentlab-aries-jax-rs-whiteboard-jackson</feature>
+        <feature>nimbus-oauth-sdk</feature>
+
+        <bundle dependency="true">mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jaxws-api-2.2/${servicemix-spec.version} </bundle>
+        <bundle dependency="true">mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.saaj-api-1.3/${servicemix-spec.version} </bundle>
+
+        <bundle dependency="true">mvn:org.apache.commons/commons-lang3/${apache.commons-lang3.version} </bundle>
+
+        <bundle dependency="true">mvn:com.google.guava/guava/${guava.version} </bundle>
+
+        <bundle dependency="true">wrap:mvn:org.apache.httpcomponents/httpclient/${apache.httpclient.version} </bundle>
+        <bundle dependency="true">wrap:mvn:org.apache.httpcomponents/httpcore/${apache.httpcore.version} </bundle>
 
         <bundle dependency="true">mvn:org.apache.shiro/shiro-core/${shiro-core.version} </bundle>
 
@@ -65,6 +67,25 @@
 
         <bundle dependency="true">mvn:javax.servlet/javax.servlet-api/${javax.servlet-api.version} </bundle>
 
+        <bundle dependency="true">mvn:javax.annotation/javax.annotation-api/${javax.annotation-api.version} </bundle>
+    </feature>
+
+    <feature version="${project.version}" name="ru.agentlab.security">
+        <bundle>mvn:ru.agentlab/karaf-rest-whiteboard/${project.version} </bundle>
+        <bundle>mvn:ru.agentlab/ru.agentlab.jwt.service/${project.version} </bundle>
+        <bundle>mvn:ru.agentlab/ru.agentlab.oauth/${project.version} </bundle>
+        <bundle>mvn:ru.agentlab/ru.agentlab.oauth.commons/${project.version} </bundle>
+        <bundle>mvn:ru.agentlab/ru.agentlab.security/${project.version} </bundle>
+    </feature>
+
+    <feature version="${project.version}" name="ru.agentlab.security.deploy">
+        <feature>ru.agentlab.security</feature>
+        <feature>ru.agentlab.security.deps</feature>
+    </feature>
+
+    <feature version="${project.version}" name="ru.agentlab.security.cors.deploy">
+        <feature>ru.agentlab.security.deploy</feature>
+        <bundle>mvn:ru.agentlab/ru.agentlab.cors/${project.version} </bundle>
     </feature>
 
 </features>

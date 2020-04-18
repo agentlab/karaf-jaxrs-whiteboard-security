@@ -16,7 +16,7 @@ import com.nimbusds.oauth2.sdk.id.Issuer;
 import com.nimbusds.openid.connect.sdk.op.OIDCProviderConfigurationRequest;
 import com.nimbusds.openid.connect.sdk.op.OIDCProviderEndpointMetadata;
 
-import ru.agentlab.oauth.commons.AuthServerUnavailable;
+import ru.agentlab.oauth.commons.IdentityServerUnavailable;
 import ru.agentlab.oauth.commons.IAuthServerProvider;
 
 @Component
@@ -79,10 +79,10 @@ public class Wso2Provider implements IAuthServerProvider {
                     if (response.indicatesSuccess()) {
                         authorizationMetadata = AuthorizationServerMetadata.parse(response.getContentAsJSONObject());
                     } else {
-                        throw new AuthServerUnavailable(response.getContent());
+                        throw new IdentityServerUnavailable(response.getContent());
                     }
                 } catch (ParseException | IOException e) {
-                    throw new AuthServerUnavailable(e.getMessage(), e);
+                    throw new IdentityServerUnavailable(e.getMessage(), e);
                 }
             }
         }
@@ -105,10 +105,10 @@ public class Wso2Provider implements IAuthServerProvider {
                     if (response.indicatesSuccess()) {
                         oidcMetadata = OIDCProviderEndpointMetadata.parse(response.getContentAsJSONObject());
                     } else {
-                        throw new AuthServerUnavailable(response.getContent());
+                        throw new IdentityServerUnavailable(response.getContent());
                     }
                 } catch (ParseException | IOException e) {
-                    throw new AuthServerUnavailable(e.getMessage(), e);
+                    throw new IdentityServerUnavailable(e.getMessage(), e);
                 }
             }
         }
