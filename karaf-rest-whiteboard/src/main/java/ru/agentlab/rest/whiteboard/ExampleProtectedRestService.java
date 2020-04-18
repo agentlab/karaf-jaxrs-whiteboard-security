@@ -32,17 +32,14 @@ import javax.ws.rs.ext.Provider;
 
 import org.osgi.service.component.annotations.Component;
 
-import ru.agentlab.karaf.rest.api.Booking;
-import ru.agentlab.karaf.rest.api.BookingService;
-
 @Path("/booking")
 @Provider
-@Component(service = BookingServiceRest.class, property = { "osgi.jaxrs.resource=true" })
-public class BookingServiceRest implements BookingService {
+@Component(service = ExampleProtectedRestService.class, property = { "osgi.jaxrs.resource=true" })
+public class ExampleProtectedRestService {
 
     private final Map<Long, Booking> bookings = new HashMap<>();
 
-    public BookingServiceRest() {
+    public ExampleProtectedRestService() {
         bookings.put(1L, new Booking() {
             {
                 setId(1L);
@@ -52,7 +49,6 @@ public class BookingServiceRest implements BookingService {
         });
     }
 
-    @Override
     @Path("/")
     @Produces("application/json")
     @GET
@@ -60,7 +56,6 @@ public class BookingServiceRest implements BookingService {
         return bookings.values();
     }
 
-    @Override
     @Path("/{id}")
     @Produces("application/json")
     @GET
@@ -68,7 +63,6 @@ public class BookingServiceRest implements BookingService {
         return bookings.get(id);
     }
 
-    @Override
     @Path("/")
     @Consumes("application/json")
     @POST
@@ -76,7 +70,6 @@ public class BookingServiceRest implements BookingService {
         bookings.put(booking.getId(), booking);
     }
 
-    @Override
     @Path("/")
     @Consumes("application/json")
     @PUT
@@ -85,7 +78,6 @@ public class BookingServiceRest implements BookingService {
         bookings.put(booking.getId(), booking);
     }
 
-    @Override
     @Path("/{id}")
     @DELETE
     public void remove(@PathParam("id") Long id) {

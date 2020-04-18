@@ -17,13 +17,7 @@
     <repository>mvn:org.apache.aries.jax.rs/org.apache.aries.jax.rs.features/1.0.6/xml
     </repository>
 
-    <feature name="karaf-rest-api" version="${project.version}">
-        <bundle>mvn:ru.agentlab/karaf-rest-api/${project.version}</bundle>
-    </feature>
-
-    <feature name="karaf-rest-whiteboard"
-        version="${project.version}">
-        <feature version="${project.version}">karaf-rest-api</feature>
+    <feature name="karaf-rest-whiteboard" version="${project.version}">
         <feature>http-whiteboard</feature>
         <feature>aries-jax-rs-whiteboard</feature>
         <feature>aries-jax-rs-whiteboard-jackson</feature>

@@ -14,22 +14,38 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package ru.agentlab.karaf.rest.api;
-
-import java.util.Collection;
+package ru.agentlab.rest.whiteboard;
 
 /**
- * Simple interface describing the booking service.
+ * A regular POJO.
  */
-public interface BookingService {
+public class Booking {
 
-    Collection<Booking> list();
+    private Long id;
+    private String customer;
+    private String flight;
 
-    Booking get(Long id);
+    public Long getId() {
+        return id;
+    }
 
-    void add(Booking booking);
-    
-    void update(Booking booking);
-    
-    void remove(Long id);
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getCustomer() {
+        return customer;
+    }
+
+    public void setCustomer(String customer) {
+        this.customer = customer;
+    }
+
+    public String getFlight() {
+        return flight;
+    }
+
+    public void setFlight(String flight) {
+        this.flight = flight;
+    }
 }
