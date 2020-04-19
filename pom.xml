@@ -16,20 +16,15 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>ru.agentlab</groupId>
-    <artifactId>karaf-rest</artifactId>
+    <groupId>ru.agentlab.security</groupId>
+    <artifactId>ru.agentlab.security.parent</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>Apache Karaf :: AgentLab :: REST</name>
+    <name>AgentLab :: REST :: SECURITY :: PARENT</name>
     <packaging>pom</packaging>
 
     <modules>
-        <module>karaf-rest-features</module>
-        <module>karaf-rest-whiteboard</module>
-        <module>ru.agentlab.cors</module>
-        <module>ru.agentlab.jwt.service</module>
-        <module>ru.agentlab.oauth</module>
-        <module>ru.agentlab.oauth.commons</module>
-        <module>ru.agentlab.security</module>
+        <module>features</module>
+        <module>plugins</module>
     </modules>
 
     <properties>
