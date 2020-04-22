@@ -1,0 +1,418 @@
+{
+	"info": {
+		"_postman_id": "7f158de0-8ae4-4ed0-bd19-b7db9814cb09",
+		"name": "oauth",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "code_flow",
+			"item": [
+				{
+					"name": "getCode(client request)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "https://example.com:9443/oauth2/authorize?response_type=code&client_id=Ynio_EuYVk8j2gn_6nUbIVQbj_Aa&state=qmfiklwejgerwqempo&scope=openid&redirect_uri=http://example.com:3000/oauth20/callback",
+							"protocol": "https",
+							"host": [
+								"example",
+								"com"
+							],
+							"port": "9443",
+							"path": [
+								"oauth2",
+								"authorize"
+							],
+							"query": [
+								{
+									"key": "response_type",
+									"value": "code"
+								},
+								{
+									"key": "client_id",
+									"value": "Ynio_EuYVk8j2gn_6nUbIVQbj_Aa"
+								},
+								{
+									"key": "state",
+									"value": "qmfiklwejgerwqempo"
+								},
+								{
+									"key": "code_verifier",
+									"value": null,
+									"disabled": true
+								},
+								{
+									"key": "scope",
+									"value": "openid"
+								},
+								{
+									"key": "redirect_uri",
+									"value": "http://example.com:3000/oauth20/callback"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "exchangeCode",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "grant_type",
+									"value": "authorization_code",
+									"type": "text"
+								},
+								{
+									"key": "code",
+									"value": "920d44b1-48ac-3bab-95f0-02ca3f9c81ed",
+									"type": "text"
+								},
+								{
+									"key": "redirect_uri",
+									"value": "http://example.com:3000/oauth20/callback",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "example.com:8181/oauth2/token",
+							"host": [
+								"example",
+								"com"
+							],
+							"port": "8181",
+							"path": [
+								"oauth2",
+								"token"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "device_code",
+			"item": [
+				{
+					"name": "get device code",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "scope",
+									"value": "openid",
+									"type": "text"
+								},
+								{
+									"key": "promt",
+									"value": "none",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "example.com:8181/oauth2/device_authorize",
+							"host": [
+								"example",
+								"com"
+							],
+							"port": "8181",
+							"path": [
+								"oauth2",
+								"device_authorize"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "login by device code",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "grant_type",
+									"value": "urn:ietf:params:oauth:grant-type:device_code",
+									"type": "text"
+								},
+								{
+									"key": "urn:ietf:params:oauth:grant-type:device_code",
+									"value": "16b28b42-9f87-4295-bace-8f676f8506f7",
+									"type": "text"
+								},
+								{
+									"key": "scope",
+									"value": "openid",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "example.com:8181/oauth2/token",
+							"host": [
+								"example",
+								"com"
+							],
+							"port": "8181",
+							"path": [
+								"oauth2",
+								"token"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "1593acd4-5ede-4376-b2d4-b2f6cf0bd664",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "ec5a471b-3fa1-4f27-8fe5-ea8316513680",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "login by password",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "grant_type",
+							"value": "password",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "testuser",
+							"type": "text"
+						},
+						{
+							"key": "username",
+							"value": "testuser",
+							"type": "text"
+						},
+						{
+							"key": "scope",
+							"value": "openid",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "localhost.test:8181/oauth2/token",
+					"host": [
+						"localhost",
+						"test"
+					],
+					"port": "8181",
+					"path": [
+						"oauth2",
+						"token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "refresh token",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "grant_type",
+							"value": "refresh_token",
+							"type": "text"
+						},
+						{
+							"key": "refresh_token",
+							"value": "f6351bad-ec29-3c2d-869d-7264d81d505c",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "example.com:8181/oauth2/token",
+					"host": [
+						"example",
+						"com"
+					],
+					"port": "8181",
+					"path": [
+						"oauth2",
+						"token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "example",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJ4NXQiOiJNell4TW1Ga09HWXdNV0kwWldObU5EY3hOR1l3WW1NNFpUQTNNV0kyTkRBelpHUXpOR00wWkdSbE5qSmtPREZrWkRSaU9URmtNV0ZoTXpVMlpHVmxOZyIsImtpZCI6Ik16WXhNbUZrT0dZd01XSTBaV05tTkRjeE5HWXdZbU00WlRBM01XSTJOREF6WkdRek5HTTBaR1JsTmpKa09ERmtaRFJpT1RGa01XRmhNelUyWkdWbE5nX1JTMjU2IiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJ0ZXN0dXNlciIsImF1ZCI6IlluaW9fRXVZVms4ajJnbl82blViSVZRYmpfQWEiLCJuYmYiOjE1ODYxMTkxMzUsImF6cCI6IlluaW9fRXVZVms4ajJnbl82blViSVZRYmpfQWEiLCJzY29wZSI6Im9wZW5pZCIsImlzcyI6Imh0dHBzOlwvXC9sb2NhbGhvc3Q6OTQ0M1wvb2F1dGgyXC90b2tlbiIsIm5hbWUiOiJ0ZXN0dXNlciIsImdyb3VwcyI6WyJJbnRlcm5hbFwvc3lzdGVtIiwiSW50ZXJuYWxcL2V2ZXJ5b25lIiwiZGVtb192ZXJzaW9uIl0sImV4cCI6MTU4NjEyMjczNSwiaWF0IjoxNTg2MTE5MTM1LCJqdGkiOiJmZDEzNzVmZS0zZGMyLTQzNjMtYjhmNS1kYTdjZTllZWQwYWEiLCJlbWFpbCI6InRlc3R1c2VyQG1haWwucnUifQ.U-COhomPgvURWJXTMb8NjtQJ7haJp4reh7HRHpB8Arha3AllW1tl9MluLMKBc1jYC7rEcq9GQsldYmXcU5mEK1qJYDNjCyk4WXiBF9HB9QLkcw3WOanXze1kUi1Quy59lx6aTiQtL4JBa2R_pw3_ZSwUdSsF2MLCAKW7mATkaodFV0ET2EZ_niQIbSXJ6brZhW4yYo-PuzAzWguDBOVcp-hKTlg8C2UfuK3u2L32Bvesmy-mf2T87nWcF15uJeooum5QZJz7Pb1cQdXofoB2MMX8U1vVS57DfXEKF7xq7glgOnGURX8vbOVVLwrvGdzlrfiJbcOjnS8wevfrWdJJ0A",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "example.com:8181/booking",
+					"host": [
+						"example",
+						"com"
+					],
+					"port": "8181",
+					"path": [
+						"booking"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "revoke",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "token_type_hint",
+							"value": "access_token",
+							"type": "text"
+						},
+						{
+							"key": "token",
+							"value": "eyJ4NXQiOiJNell4TW1Ga09HWXdNV0kwWldObU5EY3hOR1l3WW1NNFpUQTNNV0kyTkRBelpHUXpOR00wWkdSbE5qSmtPREZrWkRSaU9URmtNV0ZoTXpVMlpHVmxOZyIsImtpZCI6Ik16WXhNbUZrT0dZd01XSTBaV05tTkRjeE5HWXdZbU00WlRBM01XSTJOREF6WkdRek5HTTBaR1JsTmpKa09ERmtaRFJpT1RGa01XRmhNelUyWkdWbE5nX1JTMjU2IiwiYWxnIjoiUlMyNTYifQ.eyJzdWIiOiJ0ZXN0dXNlciIsImF1ZCI6IlluaW9fRXVZVms4ajJnbl82blViSVZRYmpfQWEiLCJuYmYiOjE1ODYxMTkxMzUsImF6cCI6IlluaW9fRXVZVms4ajJnbl82blViSVZRYmpfQWEiLCJzY29wZSI6Im9wZW5pZCIsImlzcyI6Imh0dHBzOlwvXC9sb2NhbGhvc3Q6OTQ0M1wvb2F1dGgyXC90b2tlbiIsIm5hbWUiOiJ0ZXN0dXNlciIsImdyb3VwcyI6WyJJbnRlcm5hbFwvc3lzdGVtIiwiSW50ZXJuYWxcL2V2ZXJ5b25lIiwiZGVtb192ZXJzaW9uIl0sImV4cCI6MTU4NjEyMjczNSwiaWF0IjoxNTg2MTE5MTM1LCJqdGkiOiJmZDEzNzVmZS0zZGMyLTQzNjMtYjhmNS1kYTdjZTllZWQwYWEiLCJlbWFpbCI6InRlc3R1c2VyQG1haWwucnUifQ.U-COhomPgvURWJXTMb8NjtQJ7haJp4reh7HRHpB8Arha3AllW1tl9MluLMKBc1jYC7rEcq9GQsldYmXcU5mEK1qJYDNjCyk4WXiBF9HB9QLkcw3WOanXze1kUi1Quy59lx6aTiQtL4JBa2R_pw3_ZSwUdSsF2MLCAKW7mATkaodFV0ET2EZ_niQIbSXJ6brZhW4yYo-PuzAzWguDBOVcp-hKTlg8C2UfuK3u2L32Bvesmy-mf2T87nWcF15uJeooum5QZJz7Pb1cQdXofoB2MMX8U1vVS57DfXEKF7xq7glgOnGURX8vbOVVLwrvGdzlrfiJbcOjnS8wevfrWdJJ0A",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "token_type_hint",
+							"value": "refresh_token",
+							"type": "text",
+							"disabled": true
+						}
+					]
+				},
+				"url": {
+					"raw": "example.com:8181/oauth2/revoke",
+					"host": [
+						"example",
+						"com"
+					],
+					"port": "8181",
+					"path": [
+						"oauth2",
+						"revoke"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "userInfo",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "example.com:8181/oauth2/userinfo",
+					"host": [
+						"example",
+						"com"
+					],
+					"port": "8181",
+					"path": [
+						"oauth2",
+						"userinfo"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "introspect",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "token_type_hint",
+							"value": "access_token",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "token",
+							"value": "",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "token_type_hint",
+							"value": "refresh_token",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "example.com:8181/oauth2/introspect",
+					"host": [
+						"example",
+						"com"
+					],
+					"port": "8181",
+					"path": [
+						"oauth2",
+						"introspect"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"protocolProfileBehavior": {}
+}
