@@ -1,0 +1,5 @@
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<urn:x-local:graph3> dc:publisher "Ben" .
+<urn:x-local:graph3> dc:date "2020-12-06T00:00:00Z"^^xsd:dateTime .
