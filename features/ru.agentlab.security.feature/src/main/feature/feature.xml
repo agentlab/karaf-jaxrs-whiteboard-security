@@ -44,6 +44,7 @@
     </feature>
 
     <feature version="${project.version}" name="ru.agentlab.security.deps">
+        <feature prerequisite="true" dependency="false">wrap</feature>
         <feature>http-whiteboard</feature>
         <feature>aries-jax-rs-whiteboard</feature>
         <feature>aries-jax-rs-whiteboard-jackson</feature>
@@ -63,7 +64,8 @@
 
         <bundle dependency="true">mvn:org.apache.shiro/shiro-core/${shiro-core.version} </bundle>
 
-        <bundle dependency="true">mvn:org.slf4j/slf4j-api/${sl4j.version} </bundle>
+        <bundle dependency="true">mvn:ch.qos.logback/logback-core/${logback.version}</bundle>
+        <bundle dependency="true">mvn:ch.qos.logback/logback-classic/${logback.version}</bundle>
 
         <bundle dependency="true">mvn:javax.servlet/javax.servlet-api/${javax.servlet-api.version} </bundle>
 

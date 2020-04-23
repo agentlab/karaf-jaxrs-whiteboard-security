@@ -1,6 +1,5 @@
 package ru.agentlab.security.tests;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.util.stream.Stream;
@@ -19,7 +18,7 @@ import ru.agentlab.security.oauth.commons.service.IHttpClientProvider;
 
 @RunWith(PaxExam.class)
 @ExamReactorStrategy(PerClass.class)
-public class HttpClientProviderTest extends Rdf4jJaxrsTestSupport {
+public class HttpClientProviderTest extends SecurityJaxrsTestSupport {
 
     @Configuration
     public Option[] config() {
@@ -36,15 +35,6 @@ public class HttpClientProviderTest extends Rdf4jJaxrsTestSupport {
 
     @Test
     public void checkClientNotNull() {
-        System.out.println("\n\n\n\n\n\n");
-        
-        assertEquals(3, 5);
-        
         assertNotNull(httpClientProvider.getClient());
-        
-        
-        
-        System.out.println("\n\n\n\n\n\n");
     }
-
 }

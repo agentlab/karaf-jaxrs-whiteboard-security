@@ -72,13 +72,13 @@ import org.slf4j.LoggerFactory;
  * and @ProbeBuilder
  *
  */
-public class Rdf4jJaxrsTestSupport2 {
-    public String rdf4jServer;
-    public String ENDPOINT_ADDRESS;
+public class SecurityJaxrsTestSupport2 {
+//    public String rdf4jServer;
+//    public String ENDPOINT_ADDRESS;
 
     public void init() throws Exception {
-        rdf4jServer = "http://localhost:" + getHttpPort() + "/rdf4j-server/";
-        ENDPOINT_ADDRESS = rdf4jServer + "repositories/";
+//        rdf4jServer = "http://localhost:" + getHttpPort() + "/rdf4j-server/";
+//        ENDPOINT_ADDRESS = rdf4jServer + "repositories/";
     }
 
     private static final EnumSet<FeaturesService.Option> NO_AUTO_REFRESH = EnumSet.of(FeaturesService.Option.NoAutoRefreshBundles);
@@ -159,7 +159,7 @@ public class Rdf4jJaxrsTestSupport2 {
     public Retry retry = new Retry(true);
 
     public static TestProbeBuilder probeConfigurationBase(TestProbeBuilder probe) {
-        probe.setHeader(Constants.IMPORT_PACKAGE, "org.eclipse.rdf4j.query.algebra.evaluation.impl,org.apache.cxf.jaxrs.client");
+//        probe.setHeader(Constants.IMPORT_PACKAGE, "org.eclipse.rdf4j.query.algebra.evaluation.impl,org.apache.cxf.jaxrs.client");
         return probe;
     }
 
@@ -197,12 +197,12 @@ public class Rdf4jJaxrsTestSupport2 {
                     CoreOptions.mavenBundle().groupId("org.apache.servicemix.bundles").artifactId("org.apache.servicemix.bundles.hamcrest").versionAsInProject(),
                     CoreOptions.mavenBundle().groupId("org.apache.karaf.itests").artifactId("common").versionAsInProject(), CoreOptions.mavenBundle().groupId("javax.annotation").artifactId("javax.annotation-api").versionAsInProject(),
                     KarafDistributionOption.features(CoreOptions.maven().groupId("ru.agentlab.security").artifactId("ru.agentlab.security.feature").type("xml").version("0.0.1-SNAPSHOT"), "ru.agentlab.security.cors.deploy"),
-                     CoreOptions.mavenBundle().groupId("org.mockito").artifactId("mockito-core").versionAsInProject(),
+                    // CoreOptions.mavenBundle().groupId("org.mockito").artifactId("mockito-core").versionAsInProject(),
                     CoreOptions.junitBundles(),
                     // replaceConfigurationFile("etc/host.key", getConfigFile("/etc/host.key")),
                     KarafDistributionOption.editConfigurationFilePut("etc/org.apache.karaf.features.cfg", "updateSnapshots", "none"),
                     KarafDistributionOption.editConfigurationFilePut("etc/org.ops4j.pax.web.cfg", "org.osgi.service.http.port", httpPort),
-                    KarafDistributionOption.editConfigurationFilePut("etc/org.apache.cxf.osgi.cfg", "org.apache.cxf.servlet.context", "/rdf4j-server"),
+//                    KarafDistributionOption.editConfigurationFilePut("etc/org.apache.cxf.osgi.cfg", "org.apache.cxf.servlet.context", "/rdf4j-server"),
                     KarafDistributionOption.editConfigurationFilePut("etc/org.apache.karaf.management.cfg", "rmiRegistryPort", rmiRegistryPort),
                     KarafDistributionOption.editConfigurationFilePut("etc/org.apache.karaf.management.cfg", "rmiServerPort", rmiServerPort), KarafDistributionOption.editConfigurationFilePut("etc/org.apache.karaf.shell.cfg", "sshPort", sshPort),
                     KarafDistributionOption.editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg", "org.ops4j.pax.url.mvn.localRepository", localRepository),
@@ -233,10 +233,10 @@ public class Rdf4jJaxrsTestSupport2 {
                     CoreOptions.mavenBundle().groupId("org.awaitility").artifactId("awaitility").versionAsInProject(),
                     CoreOptions.mavenBundle().groupId("org.apache.servicemix.bundles").artifactId("org.apache.servicemix.bundles.hamcrest").versionAsInProject(),
                     CoreOptions.mavenBundle().groupId("org.apache.karaf.itests").artifactId("common").versionAsInProject(),
-                    KarafDistributionOption.features(CoreOptions.maven().groupId("ru.agentlab.rdf4j").artifactId("ru.agentlab.rdf4j.features").type("xml").version("3.1.2-SNAPSHOT"), "ru.agentlab.rdf4j.jaxrs"),
+                    //KarafDistributionOption.features(CoreOptions.maven().groupId("ru.agentlab.rdf4j").artifactId("ru.agentlab.rdf4j.features").type("xml").version("3.1.2-SNAPSHOT"), "ru.agentlab.rdf4j.jaxrs"),
                     // CoreOptions.mavenBundle().groupId("org.mockito").artifactId("mockito-core").version("2.23.4"),
                     CoreOptions.junitBundles(), KarafDistributionOption.editConfigurationFilePut("etc/org.ops4j.pax.web.cfg", "org.osgi.service.http.port", httpPort),
-                    KarafDistributionOption.editConfigurationFilePut("etc/org.apache.cxf.osgi.cfg", "org.apache.cxf.servlet.context", "/rdf4j-server"),
+//                    KarafDistributionOption.editConfigurationFilePut("etc/org.apache.cxf.osgi.cfg", "org.apache.cxf.servlet.context", "/rdf4j-server"),
                     KarafDistributionOption.editConfigurationFilePut("etc/org.apache.karaf.management.cfg", "rmiRegistryPort", rmiRegistryPort),
                     KarafDistributionOption.editConfigurationFilePut("etc/org.apache.karaf.management.cfg", "rmiServerPort", rmiServerPort), KarafDistributionOption.editConfigurationFilePut("etc/org.apache.karaf.shell.cfg", "sshPort", sshPort),
                     KarafDistributionOption.editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg", "org.ops4j.pax.url.mvn.localRepository", localRepository),

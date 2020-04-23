@@ -5,7 +5,7 @@ import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.ProbeBuilder;
 import org.ops4j.pax.exam.TestProbeBuilder;
 
-public class Rdf4jJaxrsTestSupport extends Rdf4jJaxrsTestSupport2 {
+public class SecurityJaxrsTestSupport extends SecurityJaxrsTestSupport2 {
     @Configuration
     public Option[] config() {
         return configBase();
