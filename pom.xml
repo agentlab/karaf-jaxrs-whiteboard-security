@@ -57,6 +57,8 @@
         <junit.version>4.12</junit.version>
         <mockito.version>2.23.4</mockito.version>
         <assertj.version>3.11.1</assertj.version>
+        <bytebuddy.version>1.10.9</bytebuddy.version>
+        <objenesis.version>2.6</objenesis.version>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -212,10 +214,29 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
+                <groupId>net.bytebuddy</groupId>
+                <artifactId>byte-buddy-agent</artifactId>
+                <version>${bytebuddy.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>net.bytebuddy</groupId>
+                <artifactId>byte-buddy</artifactId>
+                <version>${bytebuddy.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.objenesis</groupId>
+                <artifactId>objenesis</artifactId>
+                <version>${objenesis.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
                 <groupId>javax.annotation</groupId>
                 <artifactId>javax.annotation-api</artifactId>
                 <version>${javax.annotation-api.version}</version>
             </dependency>
+
         </dependencies>
     </dependencyManagement>
 

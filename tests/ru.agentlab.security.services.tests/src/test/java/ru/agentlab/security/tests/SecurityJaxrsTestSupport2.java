@@ -50,7 +50,6 @@ import org.ops4j.pax.exam.Option;
 import org.ops4j.pax.exam.RerunTestException;
 import org.ops4j.pax.exam.TestProbeBuilder;
 import org.ops4j.pax.exam.container.remote.RBCRemoteTargetOptions;
-import org.ops4j.pax.exam.karaf.container.internal.JavaVersionUtil;
 import org.ops4j.pax.exam.karaf.options.KarafDistributionOption;
 import org.ops4j.pax.exam.karaf.options.LogLevelOption.LogLevel;
 import org.ops4j.pax.exam.options.MavenArtifactUrlReference;
@@ -187,65 +186,37 @@ public class SecurityJaxrsTestSupport2 {
         if (localRepository == null) {
             localRepository = "";
         }
-        if (JavaVersionUtil.getMajorVersion() >= 9) {
-            return new Option[] {
-                    // debugConfiguration("8889", true),
-                    KarafDistributionOption.karafDistributionConfiguration().frameworkUrl(getKarafDistribution()).name("Apache Karaf").unpackDirectory(new File("target/exam")),
-                    // enable JMX RBAC security, thanks to the KarafMBeanServerBuilder
-                    KarafDistributionOption.configureSecurity().disableKarafMBeanServerBuilder(), KarafDistributionOption.configureConsole().ignoreLocalConsole(), KarafDistributionOption.keepRuntimeFolder(),
-                    KarafDistributionOption.logLevel(LogLevel.INFO), CoreOptions.systemTimeout(3600000), RBCRemoteTargetOptions.waitForRBCFor(3600000), CoreOptions.mavenBundle().groupId("org.awaitility").artifactId("awaitility").versionAsInProject(),
-                    CoreOptions.mavenBundle().groupId("org.apache.servicemix.bundles").artifactId("org.apache.servicemix.bundles.hamcrest").versionAsInProject(),
-                    CoreOptions.mavenBundle().groupId("org.apache.karaf.itests").artifactId("common").versionAsInProject(), CoreOptions.mavenBundle().groupId("javax.annotation").artifactId("javax.annotation-api").versionAsInProject(),
-                    KarafDistributionOption.features(CoreOptions.maven().groupId("ru.agentlab.security").artifactId("ru.agentlab.security.feature").type("xml").version("0.0.1-SNAPSHOT"), "ru.agentlab.security.cors.deploy"),
-                    // CoreOptions.mavenBundle().groupId("org.mockito").artifactId("mockito-core").versionAsInProject(),
-                    CoreOptions.junitBundles(),
-                    // replaceConfigurationFile("etc/host.key", getConfigFile("/etc/host.key")),
-                    KarafDistributionOption.editConfigurationFilePut("etc/org.apache.karaf.features.cfg", "updateSnapshots", "none"),
-                    KarafDistributionOption.editConfigurationFilePut("etc/org.ops4j.pax.web.cfg", "org.osgi.service.http.port", httpPort),
+        return new Option[] {
+                // debugConfiguration("8889", true),
+                KarafDistributionOption.karafDistributionConfiguration().frameworkUrl(getKarafDistribution()).name("Apache Karaf").unpackDirectory(new File("target/exam")),
+                // enable JMX RBAC security, thanks to the KarafMBeanServerBuilder
+                KarafDistributionOption.configureSecurity().disableKarafMBeanServerBuilder(), KarafDistributionOption.configureConsole().ignoreLocalConsole(), KarafDistributionOption.keepRuntimeFolder(),
+                KarafDistributionOption.logLevel(LogLevel.INFO), CoreOptions.systemTimeout(3600000), RBCRemoteTargetOptions.waitForRBCFor(3600000), CoreOptions.mavenBundle().groupId("org.awaitility").artifactId("awaitility").versionAsInProject(),
+                CoreOptions.mavenBundle().groupId("org.apache.servicemix.bundles").artifactId("org.apache.servicemix.bundles.hamcrest").versionAsInProject(),
+                CoreOptions.mavenBundle().groupId("org.apache.karaf.itests").artifactId("common").versionAsInProject(), CoreOptions.mavenBundle().groupId("javax.annotation").artifactId("javax.annotation-api").versionAsInProject(),
+                KarafDistributionOption.features(CoreOptions.maven().groupId("ru.agentlab.security").artifactId("ru.agentlab.security.feature").type("xml").version("0.0.1-SNAPSHOT"), "ru.agentlab.security.cors.deploy"),
+                CoreOptions.mavenBundle().groupId("org.mockito").artifactId("mockito-core").versionAsInProject(), CoreOptions.junitBundles(),
+                CoreOptions.mavenBundle().groupId("net.bytebuddy").artifactId("byte-buddy").versionAsInProject(),
+                CoreOptions.mavenBundle().groupId("net.bytebuddy").artifactId("byte-buddy-agent").versionAsInProject(),
+                CoreOptions.mavenBundle().groupId("org.objenesis").artifactId("objenesis").versionAsInProject(),
+                // replaceConfigurationFile("etc/host.key", getConfigFile("/etc/host.key")),
+                KarafDistributionOption.editConfigurationFilePut("etc/org.apache.karaf.features.cfg", "updateSnapshots", "none"), KarafDistributionOption.editConfigurationFilePut("etc/org.ops4j.pax.web.cfg", "org.osgi.service.http.port", httpPort),
 //                    KarafDistributionOption.editConfigurationFilePut("etc/org.apache.cxf.osgi.cfg", "org.apache.cxf.servlet.context", "/rdf4j-server"),
-                    KarafDistributionOption.editConfigurationFilePut("etc/org.apache.karaf.management.cfg", "rmiRegistryPort", rmiRegistryPort),
-                    KarafDistributionOption.editConfigurationFilePut("etc/org.apache.karaf.management.cfg", "rmiServerPort", rmiServerPort), KarafDistributionOption.editConfigurationFilePut("etc/org.apache.karaf.shell.cfg", "sshPort", sshPort),
-                    KarafDistributionOption.editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg", "org.ops4j.pax.url.mvn.localRepository", localRepository),
-                    // add agentlab maven repositories for feature resolution
-                    KarafDistributionOption.editConfigurationFileExtend("etc/org.ops4j.pax.url.mvn.cfg", "org.ops4j.pax.url.mvn.repositories",
-                            "https://agentlab.ru/nexus/repository/maven-releases,https://agentlab.ru/nexus/repository/maven-snapshots@snapshots"),
-                    KarafDistributionOption.editConfigurationFilePut("etc/branding.properties", "welcome", ""), // No welcome banner
-                    KarafDistributionOption.editConfigurationFilePut("etc/branding-ssh.properties", "welcome", ""), new VMOption("--add-reads=java.xml=java.logging"),
-                    new VMOption("--add-exports=java.base/org.apache.karaf.specs.locator=java.xml,ALL-UNNAMED"), new VMOption("--patch-module"),
-                    new VMOption("java.base=lib/endorsed/org.apache.karaf.specs.locator-" + System.getProperty("karaf.version") + ".jar"), new VMOption("--patch-module"),
-                    new VMOption("java.xml=lib/endorsed/org.apache.karaf.specs.java.xml-" + System.getProperty("karaf.version") + ".jar"), new VMOption("--add-opens"), new VMOption("java.base/java.security=ALL-UNNAMED"), new VMOption("--add-opens"),
-                    new VMOption("java.base/java.net=ALL-UNNAMED"), new VMOption("--add-opens"), new VMOption("java.base/java.lang=ALL-UNNAMED"), new VMOption("--add-opens"), new VMOption("java.base/java.util=ALL-UNNAMED"),
-                    new VMOption("--add-opens"), new VMOption("java.naming/javax.naming.spi=ALL-UNNAMED"), new VMOption("--add-opens"), new VMOption("java.rmi/sun.rmi.transport.tcp=ALL-UNNAMED"),
-                    new VMOption("--add-exports=java.base/sun.net.www.protocol.http=ALL-UNNAMED"), new VMOption("--add-exports=java.base/sun.net.www.protocol.https=ALL-UNNAMED"),
-                    new VMOption("--add-exports=java.base/sun.net.www.protocol.jar=ALL-UNNAMED"), new VMOption("--add-exports=jdk.naming.rmi/com.sun.jndi.url.rmi=ALL-UNNAMED"), new VMOption("-classpath"),
-                    new VMOption("lib/jdk9plus/*" + File.pathSeparator + "lib/boot/*")
-
-            };
-        } else {
-            return new Option[] {
-                    // enable for remote debugging
-                    // KarafDistributionOption.debugConfiguration("5005", true),
-                    KarafDistributionOption.karafDistributionConfiguration().frameworkUrl(getKarafDistribution()).name("Apache Karaf").unpackDirectory(new File("target/exam")),
-                    // enable JMX RBAC security, thanks to the KarafMBeanServerBuilder
-                    KarafDistributionOption.configureSecurity().disableKarafMBeanServerBuilder(),
-                    // KarafDistributionOption.configureConsole().ignoreLocalConsole(),
-                    KarafDistributionOption.keepRuntimeFolder(), KarafDistributionOption.logLevel(LogLevel.INFO), CoreOptions.systemTimeout(3600000), RBCRemoteTargetOptions.waitForRBCFor(3600000),
-                    CoreOptions.mavenBundle().groupId("org.awaitility").artifactId("awaitility").versionAsInProject(),
-                    CoreOptions.mavenBundle().groupId("org.apache.servicemix.bundles").artifactId("org.apache.servicemix.bundles.hamcrest").versionAsInProject(),
-                    CoreOptions.mavenBundle().groupId("org.apache.karaf.itests").artifactId("common").versionAsInProject(),
-                    //KarafDistributionOption.features(CoreOptions.maven().groupId("ru.agentlab.rdf4j").artifactId("ru.agentlab.rdf4j.features").type("xml").version("3.1.2-SNAPSHOT"), "ru.agentlab.rdf4j.jaxrs"),
-                    // CoreOptions.mavenBundle().groupId("org.mockito").artifactId("mockito-core").version("2.23.4"),
-                    CoreOptions.junitBundles(), KarafDistributionOption.editConfigurationFilePut("etc/org.ops4j.pax.web.cfg", "org.osgi.service.http.port", httpPort),
-//                    KarafDistributionOption.editConfigurationFilePut("etc/org.apache.cxf.osgi.cfg", "org.apache.cxf.servlet.context", "/rdf4j-server"),
-                    KarafDistributionOption.editConfigurationFilePut("etc/org.apache.karaf.management.cfg", "rmiRegistryPort", rmiRegistryPort),
-                    KarafDistributionOption.editConfigurationFilePut("etc/org.apache.karaf.management.cfg", "rmiServerPort", rmiServerPort), KarafDistributionOption.editConfigurationFilePut("etc/org.apache.karaf.shell.cfg", "sshPort", sshPort),
-                    KarafDistributionOption.editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg", "org.ops4j.pax.url.mvn.localRepository", localRepository),
-                    // add agentlab maven repositories for feature resolution
-                    KarafDistributionOption.editConfigurationFileExtend("etc/org.ops4j.pax.url.mvn.cfg", "org.ops4j.pax.url.mvn.repositories",
-                            "https://agentlab.ru/nexus/repository/maven-releases,https://agentlab.ru/nexus/repository/maven-snapshots@snapshots"),
-                    KarafDistributionOption.editConfigurationFilePut("etc/branding.properties", "welcome", ""), // No welcome banner
-                    KarafDistributionOption.editConfigurationFilePut("etc/branding-ssh.properties", "welcome", "") };
-        }
+                KarafDistributionOption.editConfigurationFilePut("etc/org.apache.karaf.management.cfg", "rmiRegistryPort", rmiRegistryPort),
+                KarafDistributionOption.editConfigurationFilePut("etc/org.apache.karaf.management.cfg", "rmiServerPort", rmiServerPort), KarafDistributionOption.editConfigurationFilePut("etc/org.apache.karaf.shell.cfg", "sshPort", sshPort),
+                KarafDistributionOption.editConfigurationFilePut("etc/org.ops4j.pax.url.mvn.cfg", "org.ops4j.pax.url.mvn.localRepository", localRepository),
+                // add agentlab maven repositories for feature resolution
+                KarafDistributionOption.editConfigurationFileExtend("etc/org.ops4j.pax.url.mvn.cfg", "org.ops4j.pax.url.mvn.repositories",
+                        "https://agentlab.ru/nexus/repository/maven-releases,https://agentlab.ru/nexus/repository/maven-snapshots@snapshots"),
+                KarafDistributionOption.editConfigurationFilePut("etc/branding.properties", "welcome", ""), // No welcome banner
+                KarafDistributionOption.editConfigurationFilePut("etc/branding-ssh.properties", "welcome", ""), new VMOption("--add-reads=java.xml=java.logging"),
+                new VMOption("--add-exports=java.base/org.apache.karaf.specs.locator=java.xml,ALL-UNNAMED"), new VMOption("--patch-module"),
+                new VMOption("java.base=lib/endorsed/org.apache.karaf.specs.locator-" + System.getProperty("karaf.version") + ".jar"), new VMOption("--patch-module"),
+                new VMOption("java.xml=lib/endorsed/org.apache.karaf.specs.java.xml-" + System.getProperty("karaf.version") + ".jar"), new VMOption("--add-opens"), new VMOption("java.base/java.security=ALL-UNNAMED"), new VMOption("--add-opens"),
+                new VMOption("java.base/java.net=ALL-UNNAMED"), new VMOption("--add-opens"), new VMOption("java.base/java.lang=ALL-UNNAMED"), new VMOption("--add-opens"), new VMOption("java.base/java.util=ALL-UNNAMED"), new VMOption("--add-opens"),
+                new VMOption("java.naming/javax.naming.spi=ALL-UNNAMED"), new VMOption("--add-opens"), new VMOption("java.rmi/sun.rmi.transport.tcp=ALL-UNNAMED"), new VMOption("--add-exports=java.base/sun.net.www.protocol.http=ALL-UNNAMED"),
+                new VMOption("--add-exports=java.base/sun.net.www.protocol.https=ALL-UNNAMED"), new VMOption("--add-exports=java.base/sun.net.www.protocol.jar=ALL-UNNAMED"),
+                new VMOption("--add-exports=jdk.naming.rmi/com.sun.jndi.url.rmi=ALL-UNNAMED"), new VMOption("-classpath"), new VMOption("lib/jdk9plus/*" + File.pathSeparator + "lib/boot/*") };
     }
 
     public static int getAvailablePort(int min, int max) {
