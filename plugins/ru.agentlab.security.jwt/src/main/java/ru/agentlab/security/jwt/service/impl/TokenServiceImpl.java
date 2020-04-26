@@ -59,10 +59,10 @@ public class TokenServiceImpl implements IJwtService {
 
         try {
             getJwtProcessor().process(preProcessToken(jwt), null);
+            return true;
         } catch (ParseException | BadJOSEException | JOSEException e) {
             throw new JwtException(e.getMessage(), e);
         }
-        return true;
     }
 
     @Override
@@ -88,27 +88,12 @@ public class TokenServiceImpl implements IJwtService {
     public String getTokenPayload(String jwt) throws JwtException {
 
         if (Strings.isNullOrEmpty(jwt))
-            return null;
+            throw new JwtException("Empty token");
 
         try {
             return getJwtProcessor().process(preProcessToken(jwt), null).toJSONObject().toString();
         } catch (ParseException | BadJOSEException | JOSEException e) {
 
-            throw new JwtException(e.getMessage(), e);
-        }
-    }
-
-    @Override
-    public Map<String, Object> getClaimsMap(String jwt) throws JwtException {
-
-        if (Strings.isNullOrEmpty(jwt))
-            return null;
-
-        try {
-            Map<String, Object> claimsMap = getJwtProcessor().process(preProcessToken(jwt), null).getClaims();
-
-            return claimsMap;
-        } catch (ParseException | BadJOSEException | JOSEException e) {
             throw new JwtException(e.getMessage(), e);
         }
     }

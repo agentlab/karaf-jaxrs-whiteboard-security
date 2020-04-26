@@ -19,7 +19,7 @@
 
     <properties>
         <mockserver.serverPort>1080</mockserver.serverPort>
-        <mockserver.logLevel>DEBUG</mockserver.logLevel>
+        <mockserver.logLevel>OFF</mockserver.logLevel>
     </properties>
 
     <build>
