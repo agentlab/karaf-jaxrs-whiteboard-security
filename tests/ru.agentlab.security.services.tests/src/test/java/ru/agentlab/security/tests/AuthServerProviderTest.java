@@ -36,11 +36,6 @@ public class AuthServerProviderTest extends SecurityJaxrsTestSupport {
     private IAuthServerProvider authServerProvider;
 
     @Test
-    public void checkServiceNotNull() {
-        assertNotNull(authServerProvider);
-    }
-
-    @Test
     public void checkService() {
         assertNotNull(authServerProvider);
 

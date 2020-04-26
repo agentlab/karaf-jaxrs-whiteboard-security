@@ -1,7 +1,5 @@
 package ru.agentlab.security.jwt.service;
 
-import java.util.Map;
-
 /**
  * Service for working with JWT token
  */
