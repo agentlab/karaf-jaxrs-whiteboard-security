@@ -3,6 +3,7 @@ package ru.agentlab.security.oauth.commons.service.impl;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
+import java.net.URISyntaxException;
 
 import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
@@ -51,7 +52,14 @@ public class Wso2Provider implements IAuthServerProvider {
 
     @Override
     public URI getDeviceAuthorizationEndpointURI() {
-        return getAuthorizationMetadata().getDeviceAuthorizationEndpointURI();
+        try {
+            return new URI(OIDC_DISCOVERY.replace("token", "device_authorize"));
+        } catch (URISyntaxException e) {
+            LOGGER.error(e.getMessage(), e);
+        }
+        // current version(5.10.0) of WSO2 does not return device_authorization_endpoint
+        // return getAuthorizationMetadata().getDeviceAuthorizationEndpointURI();
+        return null;
     }
 
     @Override

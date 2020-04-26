@@ -40,7 +40,7 @@ public class AuthServerProviderTest extends SecurityJaxrsTestSupport {
         assertNotNull(authServerProvider);
 
         // @formatter:off
-//        assertEquals(Wso2TestConstants.WSO2_JKWS_ENDPOINT,authServerProvider.getDeviceAuthorizationEndpointURI().toString());
+        assertEquals(Wso2TestConstants.WSO2_DEVICE_ENDPOINT,authServerProvider.getDeviceAuthorizationEndpointURI().toString());
         assertEquals(Wso2TestConstants.WSO2_INTROSPECTION_ENDPOINT,authServerProvider.getIntrospectionEndpointURI().toString());
         assertEquals(Wso2TestConstants.WSO2_JKWS_ENDPOINT, authServerProvider.getJWKSetURI().toString());
         assertEquals(Wso2TestConstants.WSO2_REVOCATION_ENDPOINT,authServerProvider.getRevocationEndpointURI().toString());
