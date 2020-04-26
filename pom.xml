@@ -18,11 +18,13 @@
     <version>0.0.1-SNAPSHOT</version>
     <name>AgentLab :: REST :: SECURITY :: PARENT</name>
     <packaging>pom</packaging>
+
     <modules>
         <module>plugins</module>
         <module>features</module>
         <module>tests</module>
     </modules>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jackson.version>2.10.3</jackson.version>
@@ -59,7 +61,9 @@
         <assertj.version>3.11.1</assertj.version>
         <bytebuddy.version>1.10.9</bytebuddy.version>
         <objenesis.version>2.6</objenesis.version>
+        <mockserver.version>5.10.0</mockserver.version>
     </properties>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -229,6 +233,12 @@
                 <groupId>org.objenesis</groupId>
                 <artifactId>objenesis</artifactId>
                 <version>${objenesis.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.mock-server</groupId>
+                <artifactId>mockserver-netty</artifactId>
+                <version>${mockserver.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>

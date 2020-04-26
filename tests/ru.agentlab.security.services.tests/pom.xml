@@ -17,6 +17,11 @@
 
     <name>AgentLab :: REST :: SECURITY :: TESTS :: SERVICES</name>
 
+    <properties>
+        <mockserver.serverPort>1080</mockserver.serverPort>
+        <mockserver.logLevel>DEBUG</mockserver.logLevel>
+    </properties>
+
     <build>
         <plugins>
             <plugin>
@@ -28,6 +33,33 @@
                         <id>generate-depends-file</id>
                         <goals>
                             <goal>generate-depends-file</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.mock-server</groupId>
+                <artifactId>mockserver-maven-plugin</artifactId>
+                <version>${mockserver.version}</version>
+                <configuration>
+                    <serverPort>${mockserver.serverPort}</serverPort>
+                    <logLevel>${mockserver.logLevel}</logLevel>
+                    <initializationClass>ru.agentlab.security.tests.mock.wso2.Wso2ExpectationInitializer</initializationClass>
+                   <!-- <initializationJsonPath>initializerJson.json</initializationJsonPath>-->
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>process-test-classes</id>
+                        <phase>process-test-classes</phase>
+                        <goals>
+                            <goal>start</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>verify</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>stop</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -159,6 +191,11 @@
         <dependency>
             <groupId>org.objenesis</groupId>
             <artifactId>objenesis</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mock-server</groupId>
+            <artifactId>mockserver-netty</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

@@ -25,7 +25,7 @@ public class HttpClientProviderTest extends SecurityJaxrsTestSupport {
         Option[] options = new Option[] {
                 // uncomment if you need to debug (blocks test execution and waits for the
                 // debugger)
-                // KarafDistributionOption.debugConfiguration("5005", true),
+                // KarafDistributionOption.debugConfiguration("5005", true)
         };
         return Stream.of(super.config(), options).flatMap(Stream::of).toArray(Option[]::new);
     }
@@ -37,4 +37,5 @@ public class HttpClientProviderTest extends SecurityJaxrsTestSupport {
     public void checkClientNotNull() {
         assertNotNull(httpClientProvider.getClient());
     }
+
 }

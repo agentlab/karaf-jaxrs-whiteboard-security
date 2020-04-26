@@ -22,9 +22,9 @@ import ru.agentlab.security.oauth.commons.service.IdentityServerUnavailable;
 @Component
 public class Wso2Provider implements IAuthServerProvider {
     private static final Logger LOGGER = LoggerFactory.getLogger(Wso2Provider.class);
-    private static final String WSO2_PROTOCOL = getEnv("WSO2_PROTOCOL", String.class, "https");
+    private static final String WSO2_PROTOCOL = getEnv("WSO2_PROTOCOL", String.class, "http");
     private static final String WSO2_HOST = getEnv("WSO2_HOST", String.class, "localhost");
-    private static final int WSO2_PORT = getEnv("WSO2_PORT", Integer.class, 9443);
+    private static final int WSO2_PORT = getEnv("WSO2_PORT", Integer.class, 1080);
     private static final String WSO2_URL = WSO2_PROTOCOL + "://" + WSO2_HOST + ':' + WSO2_PORT;
 
     private static final String OIDC_DISCOVERY = WSO2_URL + "/oauth2/token";
