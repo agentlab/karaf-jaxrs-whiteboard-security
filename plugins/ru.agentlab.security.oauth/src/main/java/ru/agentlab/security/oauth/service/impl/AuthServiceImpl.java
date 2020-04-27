@@ -1,5 +1,8 @@
 package ru.agentlab.security.oauth.service.impl;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
+import static java.lang.System.getProperty;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.Socket;
@@ -45,8 +48,6 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static com.google.common.base.Strings.isNullOrEmpty;
 
 import com.google.common.base.Strings;
 import com.nimbusds.oauth2.sdk.AccessTokenResponse;
@@ -102,8 +103,10 @@ public class AuthServiceImpl implements IAuthService {
     private HttpServletRequest requestContext;
 
     public AuthServiceImpl() {
-        ClientID clientId = new ClientID(getEnv("CLIENT_ID", "Ynio_EuYVk8j2gn_6nUbIVQbj_Aa"));
-        Secret clientSecret = new Secret(getEnv("CLIENT_SECRET", "fTJGvvfJjUkWvn8R_NY8zXSyYQ0a"));
+        ClientID clientId = new ClientID(
+                getProperty("ru.agentlab.oauth20.client.id", getEnv("CLIENT_ID", "Ynio_EuYVk8j2gn_6nUbIVQbj_Aa")));
+        Secret clientSecret = new Secret(getProperty("ru.agentlab.oauth20.client.secret",
+                getEnv("CLIENT_SECRET", "fTJGvvfJjUkWvn8R_NY8zXSyYQ0a")));
 
         clientAuthPost = new ClientSecretPost(clientId, clientSecret);
         clientAuthBasic = new ClientSecretBasic(clientId, clientSecret);

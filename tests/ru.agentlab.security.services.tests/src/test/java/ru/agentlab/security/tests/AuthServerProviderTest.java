@@ -1,7 +1,6 @@
 package ru.agentlab.security.tests;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 import java.util.stream.Stream;
 
@@ -37,8 +36,6 @@ public class AuthServerProviderTest extends SecurityJaxrsTestSupport {
 
     @Test
     public void checkService() {
-        assertNotNull(authServerProvider);
-
         // @formatter:off
         assertEquals(Wso2TestConstants.WSO2_DEVICE_ENDPOINT,authServerProvider.getDeviceAuthorizationEndpointURI().toString());
         assertEquals(Wso2TestConstants.WSO2_INTROSPECTION_ENDPOINT,authServerProvider.getIntrospectionEndpointURI().toString());

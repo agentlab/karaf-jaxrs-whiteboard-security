@@ -66,6 +66,8 @@ import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ru.agentlab.security.tests.mock.wso2.Wso2TestConstants;
+
 /**
  * For parameterized tests. Helper class with removed annotations @Configuration
  * and @ProbeBuilder
@@ -210,7 +212,9 @@ public class SecurityJaxrsTestSupport2 {
                         "https://agentlab.ru/nexus/repository/maven-releases,https://agentlab.ru/nexus/repository/maven-snapshots@snapshots"),
                 // wso2 properties
                 CoreOptions.systemProperty("ru.agentlab.wso2.protocol").value("http"),
-                CoreOptions.systemProperty("ru.agentlab.wso2.port").value("1080"),
+                CoreOptions.systemProperty("ru.agentlab.wso2.port").value(Wso2TestConstants.WSO2_PORT),
+                CoreOptions.systemProperty("ru.agentlab.oauth20.client.id").value(Wso2TestConstants.CLIENT_ID),
+                CoreOptions.systemProperty("ru.agentlab.oauth20.client.secret").value(Wso2TestConstants.CLIENT_SECRET),
 
                 KarafDistributionOption.editConfigurationFilePut("etc/branding.properties", "welcome", ""), // No welcome banner
                 KarafDistributionOption.editConfigurationFilePut("etc/branding-ssh.properties", "welcome", ""), new VMOption("--add-reads=java.xml=java.logging"),
