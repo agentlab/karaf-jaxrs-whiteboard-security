@@ -208,6 +208,10 @@ public class SecurityJaxrsTestSupport2 {
                 // add agentlab maven repositories for feature resolution
                 KarafDistributionOption.editConfigurationFileExtend("etc/org.ops4j.pax.url.mvn.cfg", "org.ops4j.pax.url.mvn.repositories",
                         "https://agentlab.ru/nexus/repository/maven-releases,https://agentlab.ru/nexus/repository/maven-snapshots@snapshots"),
+                // wso2 properties
+                CoreOptions.systemProperty("ru.agentlab.wso2.protocol").value("http"),
+                CoreOptions.systemProperty("ru.agentlab.wso2.port").value("1080"),
+
                 KarafDistributionOption.editConfigurationFilePut("etc/branding.properties", "welcome", ""), // No welcome banner
                 KarafDistributionOption.editConfigurationFilePut("etc/branding-ssh.properties", "welcome", ""), new VMOption("--add-reads=java.xml=java.logging"),
                 new VMOption("--add-exports=java.base/org.apache.karaf.specs.locator=java.xml,ALL-UNNAMED"), new VMOption("--patch-module"),
