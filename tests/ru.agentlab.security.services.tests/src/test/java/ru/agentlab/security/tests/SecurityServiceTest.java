@@ -103,7 +103,7 @@ public class SecurityServiceTest extends SecurityJaxrsTestSupport {
         securityService.setSubject(VALID_JWT_TOKEN);
 
         Assert.assertEquals(tokenPayload, SecurityUtils.getSubject().getPrincipal());
-        Assert.assertTrue(SecurityUtils.getSubject().hasAllRoles(tokenPayload.getGroups().get()));
+        Assert.assertTrue(SecurityUtils.getSubject().hasAllRoles(tokenPayload.getGroups()));
     }
 
 }

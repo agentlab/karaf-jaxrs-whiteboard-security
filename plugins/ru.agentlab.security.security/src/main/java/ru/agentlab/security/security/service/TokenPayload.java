@@ -1,5 +1,6 @@
 package ru.agentlab.security.security.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -12,27 +13,27 @@ public class TokenPayload {
 
     private final String sub;
 
-    private Optional<List<String>> groups = Optional.empty();
+    private List<String> groups = new ArrayList<>();
 
-    private Optional<String> email = Optional.empty();
+    private String email;
 
     public TokenPayload(@JsonProperty("sub") String sub) {
         this.sub = sub;
     }
 
-    public Optional<List<String>> getGroups() {
+    public List<String> getGroups() {
         return groups;
     }
 
-    public void setGroups(Optional<List<String>> groups) {
+    public void setGroups(List<String> groups) {
         this.groups = groups;
     }
 
     public Optional<String> getEmail() {
-        return email;
+        return Optional.ofNullable(email);
     }
 
-    public void setEmail(Optional<String> email) {
+    public void setEmail(String email) {
         this.email = email;
     }
 

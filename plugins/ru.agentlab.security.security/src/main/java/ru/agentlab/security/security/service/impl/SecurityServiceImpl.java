@@ -93,8 +93,7 @@ public class SecurityServiceImpl implements ISecurityService {
             SimpleAuthorizationInfo simpleAuth = new SimpleAuthorizationInfo();
 
             if (payload != null) {
-                if (payload.getGroups().isPresent())
-                    simpleAuth.addRoles(payload.getGroups().get());
+                simpleAuth.addRoles(payload.getGroups());
             }
 
             return simpleAuth;
