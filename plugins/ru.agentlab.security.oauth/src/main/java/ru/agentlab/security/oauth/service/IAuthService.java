@@ -12,6 +12,4 @@ public interface IAuthService {
     Response revokeToken(Form form, String accessTokenCookie, String refreshTokenCookie);
 
     Response userInfo(String authorizationHeader, String accessTokenCookie);
-    
-    Response introspectToken(Form form, String accessTokenCookie, String refreshTokenCookie);
 }

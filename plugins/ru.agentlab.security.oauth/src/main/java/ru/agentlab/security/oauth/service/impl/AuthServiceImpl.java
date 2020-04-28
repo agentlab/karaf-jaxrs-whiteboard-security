@@ -60,13 +60,9 @@ import com.nimbusds.oauth2.sdk.ParseException;
 import com.nimbusds.oauth2.sdk.RefreshTokenGrant;
 import com.nimbusds.oauth2.sdk.ResourceOwnerPasswordCredentialsGrant;
 import com.nimbusds.oauth2.sdk.Scope;
-import com.nimbusds.oauth2.sdk.TokenIntrospectionRequest;
-import com.nimbusds.oauth2.sdk.TokenIntrospectionResponse;
 import com.nimbusds.oauth2.sdk.TokenRequest;
 import com.nimbusds.oauth2.sdk.TokenResponse;
 import com.nimbusds.oauth2.sdk.TokenRevocationRequest;
-import com.nimbusds.oauth2.sdk.auth.ClientAuthentication;
-import com.nimbusds.oauth2.sdk.auth.ClientSecretBasic;
 import com.nimbusds.oauth2.sdk.auth.ClientSecretPost;
 import com.nimbusds.oauth2.sdk.auth.Secret;
 import com.nimbusds.oauth2.sdk.device.DeviceCode;
@@ -92,7 +88,6 @@ public class AuthServiceImpl implements IAuthService {
     private static final Logger LOGGER = LoggerFactory.getLogger(AuthServiceImpl.class);
 
     private final ClientSecretPost clientAuthPost;
-    private final ClientAuthentication clientAuthBasic;
 
     @Reference
     private IAuthServerProvider authServerProvider;
@@ -109,7 +104,6 @@ public class AuthServiceImpl implements IAuthService {
                 getEnv("CLIENT_SECRET", "fTJGvvfJjUkWvn8R_NY8zXSyYQ0a")));
 
         clientAuthPost = new ClientSecretPost(clientId, clientSecret);
-        clientAuthBasic = new ClientSecretBasic(clientId, clientSecret);
 
         disableSSLVerification();
     }
@@ -264,62 +258,6 @@ public class AuthServiceImpl implements IAuthService {
             LOGGER.error(e.getMessage(), e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
-    }
-
-    @Override
-    @POST
-    @Path("/introspect")
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response introspectToken(Form form, @CookieParam(OAuthConstants.ACCESS_TOKEN) String accessTokenCookie,
-            @CookieParam(OAuthConstants.REFRESH_TOKEN) String refreshTokenCookie) {
-        MultivaluedMap<String, String> formParams = form.asMap();
-
-        List<String> tokenType = formParams.get(OAuthConstants.TOKEN_TYPE_HINT);
-
-        if (tokenType == null || tokenType.isEmpty() || tokenType.size() > 2) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
-        }
-
-        String tokenFromForm = formParams.getFirst(OAuthConstants.TOKEN);
-
-        Token token;
-
-        if (OAuthConstants.ACCESS_TOKEN.equals(tokenType.get(0))) {
-            String accessToken = isNullOrEmpty(accessTokenCookie) ? tokenFromForm : accessTokenCookie;
-            if (isNullOrEmpty(accessToken)) {
-                return Response.status(Response.Status.BAD_REQUEST).build();
-            } else {
-                token = new BearerAccessToken(accessToken);
-            }
-        } else if (OAuthConstants.REFRESH_TOKEN.equals(tokenType.get(0))) {
-            String refreshToken = isNullOrEmpty(refreshTokenCookie) ? tokenFromForm : refreshTokenCookie;
-            if (isNullOrEmpty(refreshToken)) {
-                return Response.status(Response.Status.BAD_REQUEST).build();
-            } else {
-                token = new RefreshToken(refreshToken);
-            }
-        } else {
-            return Response.status(Response.Status.BAD_REQUEST).build();
-        }
-
-        TokenIntrospectionRequest introspectionRequest = new TokenIntrospectionRequest(
-                authServerProvider.getIntrospectionEndpointURI(), clientAuthBasic, token);
-        try {
-            TokenIntrospectionResponse response = TokenIntrospectionResponse
-                    .parse(introspectionRequest.toHTTPRequest().send());
-
-            if (!response.indicatesSuccess()) {
-                ErrorObject errorObject = response.toErrorResponse().getErrorObject();
-                return Response.status(errorObject.getHTTPStatusCode()).entity(errorObject.getDescription()).build();
-            }
-
-            return Response.ok().entity(response.toSuccessResponse().toJSONObject().toJSONString()).build();
-        } catch (IOException | ParseException e) {
-            LOGGER.error(e.getMessage(), e);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-        }
-
     }
 
     private Optional<String> getCookieByName(String name) {

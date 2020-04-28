@@ -15,18 +15,25 @@ import org.ops4j.pax.exam.junit.PaxExam;
 import org.ops4j.pax.exam.spi.reactors.ExamReactorStrategy;
 import org.ops4j.pax.exam.spi.reactors.PerClass;
 
+import com.nimbusds.oauth2.sdk.GrantType;
+
 import ru.agentlab.security.oauth.service.IAuthService;
+import ru.agentlab.security.tests.mock.wso2.Wso2TestConstants;
+import ru.agentlab.security.tests.utils.FileUtil;
 
 @RunWith(PaxExam.class)
 @ExamReactorStrategy(PerClass.class)
 public class AuthServiceTest extends SecurityJaxrsTestSupport {
+
+    private static final String SUCCESS_TOKEN_RESPONSE_FILE = "success-token-response.json";
+    private static final String AUTHENTICATION_FAILED_FOR_TESTUSER_FILE = "authentication-failed-for-testuser.json";
 
     @Configuration
     public Option[] config() {
         Option[] options = new Option[] {
                 // uncomment if you need to debug (blocks test execution and waits for the
                 // debugger)
-//                KarafDistributionOption.debugConfiguration("5005", true) 
+                // KarafDistributionOption.debugConfiguration("5005", true)
         };
         return Stream.of(super.config(), options).flatMap(Stream::of).toArray(Option[]::new);
     }
@@ -35,17 +42,37 @@ public class AuthServiceTest extends SecurityJaxrsTestSupport {
     private IAuthService authService;
 
     @Test
-    public void checkSuccessfulPasswordAuth() {
+    public void checkSuccessfulPasswordGrant() {
 
         Form form = new Form();
-        form.param("grant_type", "password").param("password", "testuser").param("username", "testuser").param("scope",
-                "openid");
+        form.param(Wso2TestConstants.GRANT_TYPE, GrantType.PASSWORD.getValue())
+                .param(Wso2TestConstants.PASSWORD, Wso2TestConstants.TESTUSER_PASSWORD)
+                .param(Wso2TestConstants.USERNAME, Wso2TestConstants.TESTUSER_USERNAME)
+                .param(Wso2TestConstants.SCOPE, Wso2TestConstants.OPENID);
 
         Response response = authService.grantOperation(form);
 
-        Assert.assertEquals(200, response.getStatus());
+        Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+        Assert.assertEquals(readFile(SUCCESS_TOKEN_RESPONSE_FILE), response.getEntity());
+    }
 
-//        Assert.assertEquals(FileUtil.readFileFromResourses("success-token-response.json"), response.getEntity());
+    @Test
+    public void checkInvalidPasswordPasswordGrant() {
+
+        Form form = new Form();
+        form.param(Wso2TestConstants.GRANT_TYPE, GrantType.PASSWORD.getValue())
+                .param(Wso2TestConstants.PASSWORD, Wso2TestConstants.TESTUSER_INVALID_PASSWORD)
+                .param(Wso2TestConstants.USERNAME, Wso2TestConstants.TESTUSER_USERNAME)
+                .param(Wso2TestConstants.SCOPE, Wso2TestConstants.OPENID);
+
+        Response response = authService.grantOperation(form);
+
+        Assert.assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+        Assert.assertEquals(readFile(AUTHENTICATION_FAILED_FOR_TESTUSER_FILE), response.getEntity());
+    }
+
+    private String readFile(String fileName) {
+        return FileUtil.readFromUrl(this.getClass().getClassLoader().getResource(fileName));
     }
 
 }

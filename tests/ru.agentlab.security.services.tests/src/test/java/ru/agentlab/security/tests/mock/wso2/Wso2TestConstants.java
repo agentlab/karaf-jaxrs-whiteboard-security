@@ -26,4 +26,13 @@ public class Wso2TestConstants {
     public static final String CLIENT_ID = "Ynio_EuYVk8j2gn_6nUbIVQbj_Aa";
     public static final String CLIENT_SECRET = "fTJGvvfJjUkWvn8R_NY8zXSyYQ0a";
 
+    public static final String GRANT_TYPE = "grant_type";
+    public static final String PASSWORD = "password";
+    public static final String USERNAME = "username";
+    public static final String SCOPE = "scope";
+    public static final String OPENID = "openid";
+
+    public static final String TESTUSER_PASSWORD = "testuser";
+    public static final String TESTUSER_USERNAME = "testuser";
+    public static final String TESTUSER_INVALID_PASSWORD = "invalid_password";
 }
