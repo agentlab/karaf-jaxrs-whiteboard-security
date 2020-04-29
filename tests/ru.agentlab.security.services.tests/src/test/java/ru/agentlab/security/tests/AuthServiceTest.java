@@ -71,8 +71,21 @@ public class AuthServiceTest extends SecurityJaxrsTestSupport {
         Assert.assertEquals(readFile(AUTHENTICATION_FAILED_FOR_TESTUSER_FILE), response.getEntity());
     }
 
+//    @Test
+    public void checkActiveRefreshTokenGrant() {
+
+        Form form = new Form();
+        form.param(Wso2TestConstants.GRANT_TYPE, GrantType.REFRESH_TOKEN.getValue())
+                .param(Wso2TestConstants.REFRESH_TOKEN, Wso2TestConstants.ACTIVE_REFRESH_TOKEN);
+
+        Response response = authService.grantOperation(form);
+
+        Assert.assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+        Assert.assertEquals(readFile(SUCCESS_TOKEN_RESPONSE_FILE), response.getEntity());
+    }
+
     private String readFile(String fileName) {
-        return FileUtil.readFromUrl(this.getClass().getClassLoader().getResource(fileName));
+        return FileUtil.readFile(this.getClass().getClassLoader().getResource(fileName));
     }
 
 }

@@ -31,8 +31,12 @@ public class Wso2TestConstants {
     public static final String USERNAME = "username";
     public static final String SCOPE = "scope";
     public static final String OPENID = "openid";
+    public static final String REFRESH_TOKEN = "refresh_token";
 
     public static final String TESTUSER_PASSWORD = "testuser";
     public static final String TESTUSER_USERNAME = "testuser";
     public static final String TESTUSER_INVALID_PASSWORD = "invalid_password";
+
+    public static final String ACTIVE_REFRESH_TOKEN = "f6351bad-ec29-3c2d-869d-7264d81d505c";
+    public static final String EXPIRED_REFRESH_TOKEN = "f6351bad-ec29-3c2d-869d-7264d81d505e";
 }

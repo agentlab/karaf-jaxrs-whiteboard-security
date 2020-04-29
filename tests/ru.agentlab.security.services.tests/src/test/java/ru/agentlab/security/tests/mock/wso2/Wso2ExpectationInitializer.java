@@ -9,7 +9,6 @@ import static org.mockserver.model.ParameterBody.params;
 
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Paths;
 
 import org.mockserver.client.MockServerClient;
 import org.mockserver.client.initialize.PluginExpectationInitializer;
@@ -29,6 +28,7 @@ public class Wso2ExpectationInitializer implements PluginExpectationInitializer 
         mockOpenIdConfig(mockServerClient);
         mockJwksConfig(mockServerClient);
         mockPasswordAuth(mockServerClient);
+        mockRefreshToken(mockServerClient);
     }
 
     private MockServerClient mockOpenIdConfig(MockServerClient mockServerClient) {
@@ -111,6 +111,52 @@ public class Wso2ExpectationInitializer implements PluginExpectationInitializer 
         return mockServerClient;
     }
 
+    private MockServerClient mockRefreshToken(MockServerClient mockServerClient) {
+        // @formatter:off
+        mockServerClient
+            .when(request()
+                    .withMethod("POST")
+                    .withContentType(MediaType.APPLICATION_FORM_URLENCODED.withCharset(StandardCharsets.UTF_8))
+                    .withPath("/oauth2/token")
+                    .withBody(
+                            params(
+                                    param(Wso2TestConstants.GRANT_TYPE, GrantType.REFRESH_TOKEN.getValue()),
+                                    param(Wso2TestConstants.REFRESH_TOKEN, Wso2TestConstants.ACTIVE_REFRESH_TOKEN),
+                                    getClientIdParam(),
+                                    getClientSecretParam()
+                                    )
+                            )
+                    )
+            .respond(response()
+                    .withStatusCode(OK_200.code())
+                    .withContentType(MediaType.APPLICATION_JSON)
+                    .withBody(new JsonBody(getSuccessTokenResponse())));
+        // @formatter:on
+
+        // @formatter:off
+        mockServerClient
+            .when(request()
+                    .withMethod("POST")
+                    .withContentType(MediaType.APPLICATION_FORM_URLENCODED.withCharset(StandardCharsets.UTF_8))
+                    .withPath("/oauth2/token")
+                    .withBody(
+                            params(
+                                    param(Wso2TestConstants.GRANT_TYPE, GrantType.REFRESH_TOKEN.getValue()),
+                                    param(Wso2TestConstants.REFRESH_TOKEN, Wso2TestConstants.EXPIRED_REFRESH_TOKEN),
+                                    getClientIdParam(),
+                                    getClientSecretParam()
+                                    )
+                            )
+                    )
+            .respond(response()
+                    .withStatusCode(BAD_REQUEST_400.code())
+                    .withContentType(MediaType.APPLICATION_JSON)
+                    .withBody(new JsonBody(getRefreshTokenExpiredResponse())));
+        // @formatter:on
+
+        return mockServerClient;
+    }
+
     private Parameter getClientIdParam() {
         return param("client_id", Wso2TestConstants.CLIENT_ID);
     }
@@ -131,8 +177,12 @@ public class Wso2ExpectationInitializer implements PluginExpectationInitializer 
         return readFileFromResourses("authentication-failed-for-testuser.json");
     }
 
-    private  String readFileFromResourses(String fileName) throws UncheckedIOException {
-        return FileUtil.readFile(Paths.get(this.getClass().getClassLoader().getResource(fileName).getFile()));
+    private String getRefreshTokenExpiredResponse() {
+        return readFileFromResourses("refresh-token-expired-response.json");
+    }
+
+    private String readFileFromResourses(String fileName) throws UncheckedIOException {
+        return FileUtil.readFile(this.getClass().getClassLoader().getResource(fileName));
     }
 
 }
