@@ -60,7 +60,7 @@ public class JwtServiceTest extends SecurityJaxrsTestSupport {
     }
 
     @Test(expected = JwtException.class)
-    public void checkIsValidWithnonJwtToken() {
+    public void checkIsValidWithNonJwtToken() {
         jwtService.isValid(NON_JWT_ACCESS_TOKEN);
     }
 
