@@ -95,7 +95,7 @@ public class AuthServiceTest extends SecurityJaxrsTestSupport {
     // Refresh token tests
 
     @Test
-    public void checkGrantTypeTokenActiveRefreshToken() {
+    public void checkGrantTypeRefreshTokenActiveRefreshToken() {
         Form form = new Form();
         form.param(Wso2TestConstants.GRANT_TYPE, GrantType.REFRESH_TOKEN.getValue())
                 .param(Wso2TestConstants.REFRESH_TOKEN, Wso2TestConstants.ACTIVE_REFRESH_TOKEN);
@@ -107,7 +107,7 @@ public class AuthServiceTest extends SecurityJaxrsTestSupport {
     }
 
     @Test
-    public void checkGrantTypeTokenActiveRefreshTokenCookie() {
+    public void checkGrantTypeRefreshTokenActiveRefreshTokenCookie() {
         Form form = new Form();
         form.param(Wso2TestConstants.GRANT_TYPE, GrantType.REFRESH_TOKEN.getValue());
 
@@ -118,7 +118,7 @@ public class AuthServiceTest extends SecurityJaxrsTestSupport {
     }
 
     @Test
-    public void checkGrantTypeTokenExpiredRefreshToken() {
+    public void checkGrantTypeRefreshTokenExpiredRefreshToken() {
         Form form = new Form();
         form.param(Wso2TestConstants.GRANT_TYPE, GrantType.REFRESH_TOKEN.getValue())
                 .param(Wso2TestConstants.REFRESH_TOKEN, Wso2TestConstants.EXPIRED_JWT_TOKEN);
@@ -130,7 +130,7 @@ public class AuthServiceTest extends SecurityJaxrsTestSupport {
     }
 
     @Test
-    public void checkGrantTypeTokenExpiredRefreshTokenCookie() {
+    public void checkGrantTypeRefreshTokenExpiredRefreshTokenCookie() {
         Form form = new Form();
         form.param(Wso2TestConstants.GRANT_TYPE, GrantType.REFRESH_TOKEN.getValue());
 
@@ -141,7 +141,7 @@ public class AuthServiceTest extends SecurityJaxrsTestSupport {
     }
 
     @Test
-    public void checkGrantTypeTokenEmptyRefreshToken() {
+    public void checkGrantTypeRefreshTokenEmptyRefreshToken() {
         Form form = new Form();
         form.param(Wso2TestConstants.GRANT_TYPE, GrantType.REFRESH_TOKEN.getValue());
 
@@ -151,7 +151,7 @@ public class AuthServiceTest extends SecurityJaxrsTestSupport {
     }
 
     @Test
-    public void checkGrantTypeToken() {
+    public void checkGrantTypeRefreshTokenWithoutToken() {
         Form form = new Form();
         form.param(Wso2TestConstants.GRANT_TYPE, GrantType.REFRESH_TOKEN.getValue());
 
@@ -159,6 +159,56 @@ public class AuthServiceTest extends SecurityJaxrsTestSupport {
 
         Assert.assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
     }
+
+    @Test
+    public void checkGrantTypeRefreshTokenWithActiveFormTokenAndActiveCookieToken() {
+        Form form = new Form();
+        form.param(Wso2TestConstants.GRANT_TYPE, GrantType.REFRESH_TOKEN.getValue())
+                .param(Wso2TestConstants.REFRESH_TOKEN, Wso2TestConstants.ACTIVE_REFRESH_TOKEN);
+
+        Response response = authService.grantOperation(form, Wso2TestConstants.ACTIVE_REFRESH_TOKEN);
+
+        Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+        Assert.assertEquals(readFile(SUCCESS_TOKEN_RESPONSE_FILE), response.getEntity());
+    }
+
+    @Test
+    public void checkGrantTypeRefreshTokenWithExpiredFormTokenAndActiveCookieToken() {
+        Form form = new Form();
+        form.param(Wso2TestConstants.GRANT_TYPE, GrantType.REFRESH_TOKEN.getValue())
+                .param(Wso2TestConstants.REFRESH_TOKEN, Wso2TestConstants.EXPIRED_REFRESH_TOKEN);
+
+        Response response = authService.grantOperation(form, Wso2TestConstants.ACTIVE_REFRESH_TOKEN);
+
+        Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+        Assert.assertEquals(readFile(SUCCESS_TOKEN_RESPONSE_FILE), response.getEntity());
+    }
+
+    @Test
+    public void checkGrantTypeRefreshTokenWithActiveFormTokenAndExpiredCookieToken() {
+        Form form = new Form();
+        form.param(Wso2TestConstants.GRANT_TYPE, GrantType.REFRESH_TOKEN.getValue())
+                .param(Wso2TestConstants.REFRESH_TOKEN, Wso2TestConstants.ACTIVE_REFRESH_TOKEN);
+
+        Response response = authService.grantOperation(form, Wso2TestConstants.EXPIRED_JWT_TOKEN);
+
+        Assert.assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
+        Assert.assertEquals(readFile(REFRESH_TOKEN_EXPIRED_RESPONSE), response.getEntity());
+    }
+
+    @Test
+    public void checkGrantTypeRefreshTokenWithExpiredFormTokenAndExpiredCookieToken() {
+        Form form = new Form();
+        form.param(Wso2TestConstants.GRANT_TYPE, GrantType.REFRESH_TOKEN.getValue())
+                .param(Wso2TestConstants.REFRESH_TOKEN, Wso2TestConstants.EXPIRED_REFRESH_TOKEN);
+
+        Response response = authService.grantOperation(form, Wso2TestConstants.EXPIRED_REFRESH_TOKEN);
+
+        Assert.assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
+        Assert.assertEquals(readFile(REFRESH_TOKEN_EXPIRED_RESPONSE), response.getEntity());
+    }
+
+    // user info tests
 
     private String readFile(String fileName) {
         return FileUtil.readFile(this.getClass().getClassLoader().getResource(fileName));
