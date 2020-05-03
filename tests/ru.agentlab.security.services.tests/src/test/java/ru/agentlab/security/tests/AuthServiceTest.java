@@ -67,7 +67,7 @@ public class AuthServiceTest extends SecurityJaxrsTestSupport {
 
         Response response = authService.grantOperation(form);
 
-        Assert.assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+        Assert.assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
         Assert.assertEquals(readFile(AUTHENTICATION_FAILED_FOR_TESTUSER_FILE), response.getEntity());
     }
 
@@ -80,7 +80,7 @@ public class AuthServiceTest extends SecurityJaxrsTestSupport {
 
         Response response = authService.grantOperation(form);
 
-        Assert.assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+        Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
         Assert.assertEquals(readFile(SUCCESS_TOKEN_RESPONSE_FILE), response.getEntity());
     }
 

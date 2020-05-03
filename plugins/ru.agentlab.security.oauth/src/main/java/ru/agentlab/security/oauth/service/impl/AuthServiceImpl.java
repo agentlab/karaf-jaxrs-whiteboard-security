@@ -49,6 +49,7 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.nimbusds.oauth2.sdk.AccessTokenResponse;
 import com.nimbusds.oauth2.sdk.AuthorizationCode;
@@ -249,7 +250,7 @@ public class AuthServiceImpl implements IAuthService {
 
             if (!userInfoResponse.indicatesSuccess()) {
                 ErrorObject errorObject = userInfoResponse.toErrorResponse().getErrorObject();
-                return Response.status(errorObject.getHTTPStatusCode()).entity(errorObject.getDescription()).build();
+                return Response.status(Response.Status.UNAUTHORIZED).entity(errorObject.getDescription()).build();
             }
 
             return Response.ok().entity(userInfoResponse.toSuccessResponse().getUserInfo().toJSONString()).build();
@@ -387,7 +388,7 @@ public class AuthServiceImpl implements IAuthService {
         if (!response.indicatesSuccess()) {
             ErrorObject error = response.toErrorResponse().getErrorObject();
 
-            return Response.status(error.getHTTPStatusCode()).entity(error.toJSONObject().toString()).build();
+            return Response.status(Response.Status.UNAUTHORIZED).entity(error.toJSONObject().toString()).build();
         }
 
         AccessTokenResponse successResponse = response.toSuccessResponse();
@@ -395,12 +396,21 @@ public class AuthServiceImpl implements IAuthService {
         String accessToken = successResponse.getTokens().getBearerAccessToken().getValue();
         String refreshToken = successResponse.getTokens().getRefreshToken().getValue();
 
+        List<NewCookie> cookies = convertTokensToCookies(accessToken, refreshToken);
+
+        return Response.ok().cookie(cookies.stream().toArray(NewCookie[]::new))
+                .entity(successResponse.getTokens().toString()).build();
+    }
+
+    private List<NewCookie> convertTokensToCookies(String accessToken, String refreshToken) {
+        Preconditions.checkArgument(accessToken != null);
+        Preconditions.checkArgument(refreshToken != null);
+
         // TODO: expire time
         NewCookie accessTokenCookie = createTokenCookie(OAuthConstants.ACCESS_TOKEN, accessToken, 3600);
         NewCookie refreshTokenCookie = createTokenCookie(OAuthConstants.REFRESH_TOKEN, refreshToken, 86400);
 
-        return Response.ok().cookie(accessTokenCookie, refreshTokenCookie)
-                .entity(successResponse.getTokens().toString()).build();
+        return List.of(accessTokenCookie, refreshTokenCookie);
     }
 
     private NewCookie createTokenCookie(String tokenTypeHint, String token, int maxAge) {

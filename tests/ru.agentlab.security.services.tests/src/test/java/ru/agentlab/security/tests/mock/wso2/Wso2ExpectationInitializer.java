@@ -4,6 +4,7 @@ import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 import static org.mockserver.model.HttpStatusCode.BAD_REQUEST_400;
 import static org.mockserver.model.HttpStatusCode.OK_200;
+import static org.mockserver.model.HttpStatusCode.UNAUTHORIZED_401;
 import static org.mockserver.model.Parameter.param;
 import static org.mockserver.model.ParameterBody.params;
 
@@ -103,7 +104,7 @@ public class Wso2ExpectationInitializer implements PluginExpectationInitializer 
                             )
                     )
             .respond(response()
-                    .withStatusCode(BAD_REQUEST_400.code())
+                    .withStatusCode(UNAUTHORIZED_401.code())
                     .withContentType(MediaType.APPLICATION_JSON)
                     .withBody(new JsonBody(getAuthenticationFailedForTestuserResponse())));
         // @formatter:on
@@ -149,7 +150,7 @@ public class Wso2ExpectationInitializer implements PluginExpectationInitializer 
                             )
                     )
             .respond(response()
-                    .withStatusCode(BAD_REQUEST_400.code())
+                    .withStatusCode(UNAUTHORIZED_401.code())
                     .withContentType(MediaType.APPLICATION_JSON)
                     .withBody(new JsonBody(getRefreshTokenExpiredResponse())));
         // @formatter:on
