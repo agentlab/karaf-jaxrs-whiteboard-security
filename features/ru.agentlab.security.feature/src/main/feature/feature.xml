@@ -40,6 +40,7 @@
 
         <bundle dependency="true">mvn:com.nimbusds/oauth2-oidc-sdk/${oauth2-oidc-sdk.version} </bundle>
         <bundle dependency="true">mvn:com.nimbusds/lang-tag/${com.nimbusds.lang-tag.version} </bundle>
+        <bundle dependency="true">mvn:com.nimbusds/content-type/${com.nimbusds.content-type.version} </bundle>
         <bundle dependency="true">mvn:javax.mail/javax.mail-api/${javax.mail-api.version} </bundle>
     </feature>
 

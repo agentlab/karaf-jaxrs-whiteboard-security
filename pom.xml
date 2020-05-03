@@ -36,15 +36,16 @@
         <guava.version>23.0</guava.version>
         <apache.httpclient.version>4.5.11</apache.httpclient.version>
         <apache.httpcore.version>4.4.13</apache.httpcore.version>
-        <nimbus-jose-jwt.version>8.5.1</nimbus-jose-jwt.version>
+        <nimbus-jose-jwt.version>8.16</nimbus-jose-jwt.version>
         <tink.version>1.2.2</tink.version>
         <jcip-annotations.version>1.0</jcip-annotations.version>
         <json-smart.version>2.3</json-smart.version>
         <accessors-smart.version>1.2</accessors-smart.version>
         <net.minidev.asm.version>1.0.2</net.minidev.asm.version>
         <org.ow2.asm.asm.version>5.0.4</org.ow2.asm.asm.version>
-        <oauth2-oidc-sdk.version>6.23</oauth2-oidc-sdk.version>
+        <oauth2-oidc-sdk.version>8.1</oauth2-oidc-sdk.version>
         <com.nimbusds.lang-tag.version>1.4.4</com.nimbusds.lang-tag.version>
+        <com.nimbusds.content-type.version>2.0</com.nimbusds.content-type.version>
         <javax.mail-api.version>1.6.2</javax.mail-api.version>
         <shiro-core.version>1.5.2</shiro-core.version>
         <slf4j.version>1.7.30</slf4j.version>
@@ -157,6 +158,11 @@
                 <groupId>com.nimbusds</groupId>
                 <artifactId>lang-tag</artifactId>
                 <version>${com.nimbusds.lang-tag.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.nimbusds</groupId>
+                <artifactId>content-type</artifactId>
+                <version>${com.nimbusds.content-type.version}</version>
             </dependency>
             <dependency>
                 <groupId>javax.mail</groupId>
