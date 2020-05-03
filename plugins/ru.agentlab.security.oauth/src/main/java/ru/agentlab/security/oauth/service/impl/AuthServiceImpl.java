@@ -371,8 +371,7 @@ public class AuthServiceImpl implements IAuthService {
 
         if (!response.indicatesSuccess()) {
             ErrorObject error = response.toErrorResponse().getErrorObject();
-
-            return Response.status(Response.Status.UNAUTHORIZED).entity(error.toJSONObject().toString()).build();
+            return Response.status(error.getHTTPStatusCode()).entity(error.toJSONObject().toString()).build();
         }
 
         AccessTokenResponse successResponse = response.toSuccessResponse();

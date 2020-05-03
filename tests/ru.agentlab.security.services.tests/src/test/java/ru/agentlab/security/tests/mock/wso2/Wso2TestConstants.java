@@ -32,6 +32,12 @@ public class Wso2TestConstants {
     public static final String SCOPE = "scope";
     public static final String OPENID = "openid";
     public static final String REFRESH_TOKEN = "refresh_token";
+    public static final String CODE = "code";
+    public static final String REDIRECT_URI = "redirect_uri";
+    public static final String REDIRECT_URI_VALUE = "http://example.com:3000/oauth20/callback";
+
+    public static final String ACTIVE_CODE = "9add73e1-6281-3e35-9841-7615f35a2f5d";
+    public static final String INACTIVE_CODE = "8add73e1-6281-3e35-9841-7615f35a2f5d";
 
     public static final String TESTUSER_PASSWORD = "testuser";
     public static final String TESTUSER_USERNAME = "testuser";
@@ -46,4 +52,6 @@ public class Wso2TestConstants {
     public static final String USERINFO_ACCESS_TOKEN_VALIDATION_FAILED_FILE = "userinfo-access-token-validation-failed.json";
     public static final String USERINFO_SUCCESS_FILE = "userinfo-success.json";
     public static final String USERINFO_TOKEN_MISSING_FILE = "userinfo-token-missing.json";
+    public static final String CODE_GRANT_ACTIVE_CODE_RESPONSE_FILE = "code-grant-active-code-response.json";
+    public static final String CODE_GRANT_INACTIVE_CODE_RESPONSE_FILE = "code-grant-inactive-code-response.json";
 }

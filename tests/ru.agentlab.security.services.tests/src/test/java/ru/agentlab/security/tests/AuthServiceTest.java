@@ -121,7 +121,7 @@ public class AuthServiceTest extends SecurityJaxrsTestSupport {
 
         Response response = authService.grantOperation(form, null);
 
-        Assert.assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
+        Assert.assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
         Assert.assertEquals(readFile(Wso2TestConstants.REFRESH_TOKEN_EXPIRED_RESPONSE_FILE), response.getEntity());
     }
 
@@ -132,7 +132,7 @@ public class AuthServiceTest extends SecurityJaxrsTestSupport {
 
         Response response = authService.grantOperation(form, Wso2TestConstants.EXPIRED_ACESS_JWT_TOKEN);
 
-        Assert.assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
+        Assert.assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
         Assert.assertEquals(readFile(Wso2TestConstants.REFRESH_TOKEN_EXPIRED_RESPONSE_FILE), response.getEntity());
     }
 
@@ -188,7 +188,7 @@ public class AuthServiceTest extends SecurityJaxrsTestSupport {
 
         Response response = authService.grantOperation(form, Wso2TestConstants.EXPIRED_ACESS_JWT_TOKEN);
 
-        Assert.assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
+        Assert.assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
         Assert.assertEquals(readFile(Wso2TestConstants.REFRESH_TOKEN_EXPIRED_RESPONSE_FILE), response.getEntity());
     }
 
@@ -200,7 +200,7 @@ public class AuthServiceTest extends SecurityJaxrsTestSupport {
 
         Response response = authService.grantOperation(form, Wso2TestConstants.EXPIRED_REFRESH_TOKEN);
 
-        Assert.assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
+        Assert.assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
         Assert.assertEquals(readFile(Wso2TestConstants.REFRESH_TOKEN_EXPIRED_RESPONSE_FILE), response.getEntity());
     }
 
@@ -296,6 +296,56 @@ public class AuthServiceTest extends SecurityJaxrsTestSupport {
 
         Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
         Assert.assertEquals(readFile(Wso2TestConstants.USERINFO_SUCCESS_FILE), response.getEntity());
+    }
+
+    // Code flow tests
+
+    @Test
+    public void checkGrantTypeCodeActiveCode() {
+        Form form = new Form();
+        form.param(Wso2TestConstants.GRANT_TYPE, GrantType.AUTHORIZATION_CODE.getValue())
+                .param(Wso2TestConstants.CODE, Wso2TestConstants.ACTIVE_CODE)
+                .param(Wso2TestConstants.REDIRECT_URI, Wso2TestConstants.REDIRECT_URI_VALUE);
+
+        Response response = authService.grantOperation(form, null);
+
+        Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+        Assert.assertEquals(readFile(Wso2TestConstants.CODE_GRANT_ACTIVE_CODE_RESPONSE_FILE), response.getEntity());
+    }
+
+    @Test
+    public void checkGrantTypeCodeInactiveCode() {
+        Form form = new Form();
+        form.param(Wso2TestConstants.GRANT_TYPE, GrantType.AUTHORIZATION_CODE.getValue())
+                .param(Wso2TestConstants.CODE, Wso2TestConstants.INACTIVE_CODE)
+                .param(Wso2TestConstants.REDIRECT_URI, Wso2TestConstants.REDIRECT_URI_VALUE);
+
+        Response response = authService.grantOperation(form, null);
+
+        Assert.assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+        Assert.assertEquals(readFile(Wso2TestConstants.CODE_GRANT_INACTIVE_CODE_RESPONSE_FILE), response.getEntity());
+    }
+
+    @Test
+    public void checkGrantTypeCodeEmptyCode() {
+        Form form = new Form();
+        form.param(Wso2TestConstants.GRANT_TYPE, GrantType.AUTHORIZATION_CODE.getValue())
+                .param(Wso2TestConstants.REDIRECT_URI, Wso2TestConstants.REDIRECT_URI_VALUE);
+
+        Response response = authService.grantOperation(form, null);
+
+        Assert.assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+    }
+
+    @Test
+    public void checkGrantTypeCodeEmptyRedirectUri() {
+        Form form = new Form();
+        form.param(Wso2TestConstants.GRANT_TYPE, GrantType.AUTHORIZATION_CODE.getValue()).param(Wso2TestConstants.CODE,
+                Wso2TestConstants.INACTIVE_CODE);
+
+        Response response = authService.grantOperation(form, null);
+
+        Assert.assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
     }
 
     private String getBearerHeaderValue(String token) {

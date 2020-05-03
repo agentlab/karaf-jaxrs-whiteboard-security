@@ -32,6 +32,7 @@ public class Wso2ExpectationInitializer implements PluginExpectationInitializer 
         mockPasswordAuth(mockServerClient);
         mockRefreshToken(mockServerClient);
         mockUserInfo(mockServerClient);
+        mockCodeFlow(mockServerClient);
     }
 
     private MockServerClient mockOpenIdConfig(MockServerClient mockServerClient) {
@@ -152,7 +153,7 @@ public class Wso2ExpectationInitializer implements PluginExpectationInitializer 
                             )
                     )
             .respond(response()
-                    .withStatusCode(UNAUTHORIZED_401.code())
+                    .withStatusCode(BAD_REQUEST_400.code())
                     .withContentType(MediaType.APPLICATION_JSON)
                     .withBody(new JsonBody(getRefreshTokenExpiredResponse())));
         // @formatter:on
@@ -235,16 +236,100 @@ public class Wso2ExpectationInitializer implements PluginExpectationInitializer 
         // @formatter:on
 
         // @formatter:off
-      mockServerClient
-          .when(request()
-                  .withMethod("GET")
-                  .withPath("/oauth2/userinfo")
-                  )
-          .respond(response()
-                  .withStatusCode(BAD_REQUEST_400.code())
-                  .withContentType(MediaType.APPLICATION_JSON)
-                  .withBody(new JsonBody(getUserinfoTokenMissing())));
-      // @formatter:on
+        mockServerClient
+            .when(request()
+                    .withMethod("GET")
+                    .withPath("/oauth2/userinfo")
+                    )
+            .respond(response()
+                    .withStatusCode(BAD_REQUEST_400.code())
+                    .withContentType(MediaType.APPLICATION_JSON)
+                    .withBody(new JsonBody(getUserinfoTokenMissing())));
+        // @formatter:on
+
+        return mockServerClient;
+    }
+
+    private MockServerClient mockCodeFlow(MockServerClient mockServerClient) {
+        // @formatter:off
+        mockServerClient
+            .when(request()
+                    .withMethod("POST")
+                    .withContentType(MediaType.APPLICATION_FORM_URLENCODED.withCharset(StandardCharsets.UTF_8))
+                    .withPath("/oauth2/token")
+                    .withBody(
+                            params(
+                                    param(Wso2TestConstants.GRANT_TYPE, GrantType.AUTHORIZATION_CODE.getValue()),
+                                    param(Wso2TestConstants.CODE, Wso2TestConstants.ACTIVE_CODE),
+                                    param(Wso2TestConstants.REDIRECT_URI, Wso2TestConstants.REDIRECT_URI_VALUE),
+                                    getClientIdParam(),
+                                    getClientSecretParam()
+                                    )
+                            )
+                    )
+            .respond(response()
+                    .withStatusCode(OK_200.code())
+                    .withContentType(MediaType.APPLICATION_JSON)
+                    .withBody(new JsonBody(getCodeFlowActiveCodeResponse())));
+        // @formatter:on
+
+        // @formatter:off
+        mockServerClient
+            .when(request()
+                    .withMethod("POST")
+                    .withContentType(MediaType.APPLICATION_FORM_URLENCODED.withCharset(StandardCharsets.UTF_8))
+                    .withPath("/oauth2/token")
+                    .withBody(
+                            params(
+                                    param(Wso2TestConstants.GRANT_TYPE, GrantType.AUTHORIZATION_CODE.getValue()),
+                                    param(Wso2TestConstants.CODE, Wso2TestConstants.INACTIVE_CODE),
+                                    param(Wso2TestConstants.REDIRECT_URI, Wso2TestConstants.REDIRECT_URI_VALUE),
+                                    getClientIdParam(),
+                                    getClientSecretParam()
+                                    )
+                            )
+                    )
+            .respond(response()
+                    .withStatusCode(BAD_REQUEST_400.code())
+                    .withContentType(MediaType.APPLICATION_JSON)
+                    .withBody(new JsonBody(getCodeFlowInactiveCodeResponse())));
+        // @formatter:on
+
+        // @formatter:off
+        mockServerClient
+            .when(request()
+                    .withMethod("POST")
+                    .withContentType(MediaType.APPLICATION_FORM_URLENCODED.withCharset(StandardCharsets.UTF_8))
+                    .withPath("/oauth2/token")
+                    .withBody(
+                            params(
+                                    param(Wso2TestConstants.GRANT_TYPE, GrantType.AUTHORIZATION_CODE.getValue()),
+                                    param(Wso2TestConstants.REDIRECT_URI, Wso2TestConstants.REDIRECT_URI_VALUE),
+                                    getClientIdParam(),
+                                    getClientSecretParam()
+                                    )
+                            )
+                    )
+            .respond(response().withStatusCode(BAD_REQUEST_400.code())); // TODO: add body
+        // @formatter:on
+
+        // @formatter:off
+        mockServerClient
+            .when(request()
+                    .withMethod("POST")
+                    .withContentType(MediaType.APPLICATION_FORM_URLENCODED.withCharset(StandardCharsets.UTF_8))
+                    .withPath("/oauth2/token")
+                    .withBody(
+                            params(
+                                    param(Wso2TestConstants.GRANT_TYPE, GrantType.AUTHORIZATION_CODE.getValue()),
+                                    param(Wso2TestConstants.CODE, Wso2TestConstants.INACTIVE_CODE),
+                                    getClientIdParam(),
+                                    getClientSecretParam()
+                                    )
+                            )
+                    )
+            .respond(response().withStatusCode(BAD_REQUEST_400.code())); // TODO: add body
+        // @formatter:on
 
         return mockServerClient;
     }
@@ -283,6 +368,14 @@ public class Wso2ExpectationInitializer implements PluginExpectationInitializer 
 
     private String getUserinfoTokenMissing() {
         return readFileFromResourses(Wso2TestConstants.USERINFO_TOKEN_MISSING_FILE);
+    }
+
+    private String getCodeFlowActiveCodeResponse() {
+        return readFileFromResourses(Wso2TestConstants.CODE_GRANT_ACTIVE_CODE_RESPONSE_FILE);
+    }
+
+    private String getCodeFlowInactiveCodeResponse() {
+        return readFileFromResourses(Wso2TestConstants.CODE_GRANT_INACTIVE_CODE_RESPONSE_FILE);
     }
 
     private String readFileFromResourses(String fileName) throws UncheckedIOException {
