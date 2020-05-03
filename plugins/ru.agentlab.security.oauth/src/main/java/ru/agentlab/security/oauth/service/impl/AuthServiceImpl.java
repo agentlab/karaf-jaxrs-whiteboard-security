@@ -12,7 +12,6 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
@@ -21,8 +20,6 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509ExtendedTrustManager;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.GET;
@@ -30,7 +27,6 @@ import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Form;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -95,9 +91,6 @@ public class AuthServiceImpl implements IAuthService {
     @Reference
     private IHttpClientProvider httpClientProvider;
 
-    @Context
-    private HttpServletRequest requestContext;
-
     public AuthServiceImpl() {
         ClientID clientId = new ClientID(
                 getProperty("ru.agentlab.oauth20.client.id", getEnv("CLIENT_ID", "Ynio_EuYVk8j2gn_6nUbIVQbj_Aa")));
@@ -114,7 +107,7 @@ public class AuthServiceImpl implements IAuthService {
     @Path("/token")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response grantOperation(Form form) {
+    public Response grantOperation(Form form, @CookieParam(OAuthConstants.REFRESH_TOKEN) String refreshTokenCookie) {
         MultivaluedMap<String, String> formParams = form.asMap();
 
         List<String> grantTypes = formParams.get("grant_type");
@@ -135,7 +128,7 @@ public class AuthServiceImpl implements IAuthService {
         if (GrantType.PASSWORD.equals(grantType)) {
             return clientCredentialsGrantFlow(form);
         } else if (GrantType.REFRESH_TOKEN.equals(grantType)) {
-            return refreshTokenGrantFlow(form);
+            return refreshTokenGrantFlow(form, refreshTokenCookie);
         } else if (GrantType.DEVICE_CODE.equals(grantType)) {
             return deviceGrantFlow(form);
         } else if (GrantType.AUTHORIZATION_CODE.equals(grantType)) {
@@ -225,27 +218,24 @@ public class AuthServiceImpl implements IAuthService {
     public Response userInfo(@HeaderParam(HttpHeaders.AUTHORIZATION) String authorizationHeader,
             @CookieParam(OAuthConstants.ACCESS_TOKEN) String accessTokenCookie) {
 
-        BearerAccessToken bearerAccessToken = null;
+        Optional<BearerAccessToken> accessToken = Optional.ofNullable(accessTokenCookie)
+                .map(token -> new BearerAccessToken(token))
+                .or(() -> Optional.ofNullable(authorizationHeader).map(token -> {
+                    try {
+                        return BearerAccessToken.parse(token);
+                    } catch (ParseException e) {
+                        LOGGER.error(e.getMessage(), e);
+                        return null;
+                    }
+                }));
 
-        if (!isNullOrEmpty(accessTokenCookie)) {
-            bearerAccessToken = new BearerAccessToken(accessTokenCookie);
-        }
-
-        if (bearerAccessToken == null) {
-            try {
-                bearerAccessToken = BearerAccessToken.parse(authorizationHeader);
-            } catch (ParseException e) {
-                LOGGER.error(e.getMessage(), e);
-            }
-        }
-
-        if (bearerAccessToken == null) {
+        if (accessToken.isEmpty()) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
 
         try {
             HTTPResponse httpResponse = new UserInfoRequest(authServerProvider.getUserInfoEndpointURI(),
-                    bearerAccessToken).toHTTPRequest().send();
+                    accessToken.get()).toHTTPRequest().send();
             UserInfoResponse userInfoResponse = UserInfoResponse.parse(httpResponse);
 
             if (!userInfoResponse.indicatesSuccess()) {
@@ -259,12 +249,6 @@ public class AuthServiceImpl implements IAuthService {
             LOGGER.error(e.getMessage(), e);
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
-    }
-
-    private Optional<String> getCookieByName(String name) {
-        List<Cookie> cookies = Arrays.asList(Optional.ofNullable(requestContext.getCookies()).orElse(new Cookie[0]));
-        return cookies.stream().filter(cookie -> name.equals(cookie.getName())).findAny()
-                .map(cookie -> cookie.getValue());
     }
 
     private Response clientCredentialsGrantFlow(Form form) {
@@ -281,8 +265,8 @@ public class AuthServiceImpl implements IAuthService {
 
     }
 
-    private Response refreshTokenGrantFlow(Form form) {
-        String refreshToken = getCookieByName(OAuthConstants.REFRESH_TOKEN)
+    private Response refreshTokenGrantFlow(Form form, String refreshTokenCookie) {
+        String refreshToken = Optional.ofNullable(refreshTokenCookie)
                 .orElse(form.asMap().getFirst(OAuthConstants.REFRESH_TOKEN));
 
         if (isBadRequest(refreshToken)) {

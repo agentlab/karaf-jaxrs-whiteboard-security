@@ -155,6 +155,26 @@ public class Wso2ExpectationInitializer implements PluginExpectationInitializer 
                     .withBody(new JsonBody(getRefreshTokenExpiredResponse())));
         // @formatter:on
 
+        // @formatter:off
+        mockServerClient
+            .when(request()
+                    .withMethod("POST")
+                    .withContentType(MediaType.APPLICATION_FORM_URLENCODED.withCharset(StandardCharsets.UTF_8))
+                    .withPath("/oauth2/token")
+                    .withBody(
+                            params(
+                                    param(Wso2TestConstants.GRANT_TYPE, GrantType.REFRESH_TOKEN.getValue()),
+                                    getClientIdParam(),
+                                    getClientSecretParam()
+                                    )
+                            )
+                    )
+            .respond(response()
+                    .withStatusCode(BAD_REQUEST_400.code())
+                    .withContentType(MediaType.APPLICATION_JSON)
+                    .withBody(new JsonBody(getRefreshTokenExpiredResponse())));
+        // @formatter:on
+
         return mockServerClient;
     }
 
