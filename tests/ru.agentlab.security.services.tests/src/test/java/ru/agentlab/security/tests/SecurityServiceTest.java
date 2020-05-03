@@ -1,9 +1,9 @@
 package ru.agentlab.security.tests;
 
-import static ru.agentlab.security.tests.mock.wso2.Wso2TestConstants.EXPIRED_JWT_TOKEN;
-import static ru.agentlab.security.tests.mock.wso2.Wso2TestConstants.HACKED_JWT_TOKEN;
-import static ru.agentlab.security.tests.mock.wso2.Wso2TestConstants.NON_JWT_TOKEN;
-import static ru.agentlab.security.tests.mock.wso2.Wso2TestConstants.VALID_JWT_TOKEN;
+import static ru.agentlab.security.tests.mock.wso2.Wso2TestConstants.EXPIRED_ACESS_JWT_TOKEN;
+import static ru.agentlab.security.tests.mock.wso2.Wso2TestConstants.HACKED_ACCESS_JWT_TOKEN;
+import static ru.agentlab.security.tests.mock.wso2.Wso2TestConstants.NON_JWT_ACCESS_TOKEN;
+import static ru.agentlab.security.tests.mock.wso2.Wso2TestConstants.VALID_ACCESS_JWT_TOKEN;
 
 import java.util.stream.Stream;
 
@@ -52,8 +52,8 @@ public class SecurityServiceTest extends SecurityJaxrsTestSupport {
 
     @Test
     public void checkIsTokenExpired() {
-        Assert.assertFalse(securityService.isTokenExpired(VALID_JWT_TOKEN));
-        Assert.assertTrue(securityService.isTokenExpired(EXPIRED_JWT_TOKEN));
+        Assert.assertFalse(securityService.isTokenExpired(VALID_ACCESS_JWT_TOKEN));
+        Assert.assertTrue(securityService.isTokenExpired(EXPIRED_ACESS_JWT_TOKEN));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -68,7 +68,7 @@ public class SecurityServiceTest extends SecurityJaxrsTestSupport {
 
     @Test(expected = IncorrectCredentialsException.class)
     public void checkIsTokenExpiredWithNonJwtToken() {
-        securityService.isTokenExpired(NON_JWT_TOKEN);
+        securityService.isTokenExpired(NON_JWT_ACCESS_TOKEN);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -83,12 +83,12 @@ public class SecurityServiceTest extends SecurityJaxrsTestSupport {
 
     @Test(expected = AuthenticationException.class)
     public void checkSetSubjectWithHackedToken() {
-        securityService.setSubject(HACKED_JWT_TOKEN);
+        securityService.setSubject(HACKED_ACCESS_JWT_TOKEN);
     }
 
     @Test(expected = AuthenticationException.class)
     public void checkSetSubjectWithExpiredToken() {
-        securityService.setSubject(EXPIRED_JWT_TOKEN);
+        securityService.setSubject(EXPIRED_ACESS_JWT_TOKEN);
     }
 
     @Test
@@ -98,9 +98,9 @@ public class SecurityServiceTest extends SecurityJaxrsTestSupport {
         mapper.registerModule(new Jdk8Module());
         mapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
 
-        TokenPayload tokenPayload = mapper.readValue(jwtService.getTokenPayload(VALID_JWT_TOKEN), TokenPayload.class);
+        TokenPayload tokenPayload = mapper.readValue(jwtService.getTokenPayload(VALID_ACCESS_JWT_TOKEN), TokenPayload.class);
 
-        securityService.setSubject(VALID_JWT_TOKEN);
+        securityService.setSubject(VALID_ACCESS_JWT_TOKEN);
 
         Assert.assertEquals(tokenPayload, SecurityUtils.getSubject().getPrincipal());
         Assert.assertTrue(SecurityUtils.getSubject().hasAllRoles(tokenPayload.getGroups()));

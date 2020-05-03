@@ -1,0 +1,4 @@
+{
+    "error_description": "Bearer token missing",
+    "error": "invalid_request"
+}

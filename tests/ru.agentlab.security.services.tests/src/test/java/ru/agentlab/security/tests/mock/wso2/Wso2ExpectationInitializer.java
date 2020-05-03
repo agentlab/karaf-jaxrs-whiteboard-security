@@ -13,6 +13,7 @@ import java.nio.charset.StandardCharsets;
 
 import org.mockserver.client.MockServerClient;
 import org.mockserver.client.initialize.PluginExpectationInitializer;
+import org.mockserver.model.Header;
 import org.mockserver.model.JsonBody;
 import org.mockserver.model.MediaType;
 import org.mockserver.model.Parameter;
@@ -30,6 +31,7 @@ public class Wso2ExpectationInitializer implements PluginExpectationInitializer 
         mockJwksConfig(mockServerClient);
         mockPasswordAuth(mockServerClient);
         mockRefreshToken(mockServerClient);
+        mockUserInfo(mockServerClient);
     }
 
     private MockServerClient mockOpenIdConfig(MockServerClient mockServerClient) {
@@ -178,6 +180,75 @@ public class Wso2ExpectationInitializer implements PluginExpectationInitializer 
         return mockServerClient;
     }
 
+    private MockServerClient mockUserInfo(MockServerClient mockServerClient) {
+
+        // @formatter:off
+        mockServerClient
+            .when(request()
+                    .withHeader(new Header("Authorization", "Bearer " + Wso2TestConstants.VALID_ACCESS_JWT_TOKEN))
+                    .withMethod("GET")
+                    .withPath("/oauth2/userinfo")
+                    )
+            .respond(response()
+                    .withStatusCode(OK_200.code())
+                    .withContentType(MediaType.APPLICATION_JSON)
+                    .withBody(new JsonBody(getUserinfoSuccess())));
+        // @formatter:on
+
+        // @formatter:off
+        mockServerClient
+            .when(request()
+                    .withHeader("Authorization", "Bearer " + Wso2TestConstants.EXPIRED_ACESS_JWT_TOKEN)
+                    .withMethod("GET")
+                    .withPath("/oauth2/userinfo")
+                    )
+            .respond(response()
+                    .withStatusCode(UNAUTHORIZED_401.code())
+                    .withContentType(MediaType.APPLICATION_JSON)
+                    .withBody(new JsonBody(getUserinfoAccessTokenValidationFailed())));
+        // @formatter:on
+
+        // @formatter:off
+        mockServerClient
+            .when(request()
+                    .withHeader("Authorization", "Bearer " + Wso2TestConstants.HACKED_ACCESS_JWT_TOKEN)
+                    .withMethod("GET")
+                    .withPath("/oauth2/userinfo")
+                    )
+            .respond(response()
+                    .withStatusCode(UNAUTHORIZED_401.code())
+                    .withContentType(MediaType.APPLICATION_JSON)
+                    .withBody(new JsonBody(getUserinfoAccessTokenValidationFailed())));
+        // @formatter:on
+
+        // @formatter:off
+        mockServerClient
+            .when(request()
+                    .withHeader("Authorization", "Bearer " + Wso2TestConstants.NON_JWT_ACCESS_TOKEN)
+                    .withMethod("GET")
+                    .withPath("/oauth2/userinfo")
+                    )
+            .respond(response()
+                    .withStatusCode(UNAUTHORIZED_401.code())
+                    .withContentType(MediaType.APPLICATION_JSON)
+                    .withBody(new JsonBody(getUserinfoAccessTokenValidationFailed())));
+        // @formatter:on
+
+        // @formatter:off
+      mockServerClient
+          .when(request()
+                  .withMethod("GET")
+                  .withPath("/oauth2/userinfo")
+                  )
+          .respond(response()
+                  .withStatusCode(BAD_REQUEST_400.code())
+                  .withContentType(MediaType.APPLICATION_JSON)
+                  .withBody(new JsonBody(getUserinfoTokenMissing())));
+      // @formatter:on
+
+        return mockServerClient;
+    }
+
     private Parameter getClientIdParam() {
         return param("client_id", Wso2TestConstants.CLIENT_ID);
     }
@@ -191,15 +262,27 @@ public class Wso2ExpectationInitializer implements PluginExpectationInitializer 
     }
 
     private String getSuccessTokenResponse() throws UncheckedIOException {
-        return readFileFromResourses("success-token-response.json");
+        return readFileFromResourses(Wso2TestConstants.SUCCESS_TOKEN_RESPONSE_FILE);
     }
 
     private String getAuthenticationFailedForTestuserResponse() {
-        return readFileFromResourses("authentication-failed-for-testuser.json");
+        return readFileFromResourses(Wso2TestConstants.AUTHENTICATION_FAILED_FOR_TESTUSER_FILE);
     }
 
     private String getRefreshTokenExpiredResponse() {
-        return readFileFromResourses("refresh-token-expired-response.json");
+        return readFileFromResourses(Wso2TestConstants.REFRESH_TOKEN_EXPIRED_RESPONSE_FILE);
+    }
+
+    private String getUserinfoAccessTokenValidationFailed() {
+        return readFileFromResourses(Wso2TestConstants.USERINFO_ACCESS_TOKEN_VALIDATION_FAILED_FILE);
+    }
+
+    private String getUserinfoSuccess() {
+        return readFileFromResourses(Wso2TestConstants.USERINFO_SUCCESS_FILE);
+    }
+
+    private String getUserinfoTokenMissing() {
+        return readFileFromResourses(Wso2TestConstants.USERINFO_TOKEN_MISSING_FILE);
     }
 
     private String readFileFromResourses(String fileName) throws UncheckedIOException {

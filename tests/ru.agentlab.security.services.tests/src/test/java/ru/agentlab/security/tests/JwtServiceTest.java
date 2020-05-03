@@ -1,9 +1,9 @@
 package ru.agentlab.security.tests;
 
-import static ru.agentlab.security.tests.mock.wso2.Wso2TestConstants.EXPIRED_JWT_TOKEN;
-import static ru.agentlab.security.tests.mock.wso2.Wso2TestConstants.HACKED_JWT_TOKEN;
-import static ru.agentlab.security.tests.mock.wso2.Wso2TestConstants.NON_JWT_TOKEN;
-import static ru.agentlab.security.tests.mock.wso2.Wso2TestConstants.VALID_JWT_TOKEN;
+import static ru.agentlab.security.tests.mock.wso2.Wso2TestConstants.EXPIRED_ACESS_JWT_TOKEN;
+import static ru.agentlab.security.tests.mock.wso2.Wso2TestConstants.HACKED_ACCESS_JWT_TOKEN;
+import static ru.agentlab.security.tests.mock.wso2.Wso2TestConstants.NON_JWT_ACCESS_TOKEN;
+import static ru.agentlab.security.tests.mock.wso2.Wso2TestConstants.VALID_ACCESS_JWT_TOKEN;
 
 import java.util.stream.Stream;
 
@@ -40,12 +40,12 @@ public class JwtServiceTest extends SecurityJaxrsTestSupport {
 
     @Test
     public void checkIsValidWithValidToken() {
-        Assert.assertTrue(jwtService.isValid(VALID_JWT_TOKEN));
+        Assert.assertTrue(jwtService.isValid(VALID_ACCESS_JWT_TOKEN));
     }
 
     @Test(expected = JwtException.class)
     public void checkIsValidWithExpiredToken() {
-        jwtService.isValid(EXPIRED_JWT_TOKEN);
+        jwtService.isValid(EXPIRED_ACESS_JWT_TOKEN);
     }
 
     @Test
@@ -56,18 +56,18 @@ public class JwtServiceTest extends SecurityJaxrsTestSupport {
 
     @Test(expected = JwtException.class)
     public void checkIsValidWithHackedToken() {
-        jwtService.isValid(HACKED_JWT_TOKEN);
+        jwtService.isValid(HACKED_ACCESS_JWT_TOKEN);
     }
 
     @Test(expected = JwtException.class)
     public void checkIsValidWithnonJwtToken() {
-        jwtService.isValid(NON_JWT_TOKEN);
+        jwtService.isValid(NON_JWT_ACCESS_TOKEN);
     }
 
     @Test
     public void checkIsExpiredJwtToken() {
-        Assert.assertTrue(jwtService.isExpired(EXPIRED_JWT_TOKEN));
-        Assert.assertFalse(jwtService.isExpired(VALID_JWT_TOKEN));
+        Assert.assertTrue(jwtService.isExpired(EXPIRED_ACESS_JWT_TOKEN));
+        Assert.assertFalse(jwtService.isExpired(VALID_ACCESS_JWT_TOKEN));
     }
 
     @Test(expected = JwtException.class)
@@ -82,12 +82,12 @@ public class JwtServiceTest extends SecurityJaxrsTestSupport {
 
     @Test(expected = JwtException.class)
     public void checkIsExpiredWithNonJwtTiken() {
-        jwtService.isExpired(NON_JWT_TOKEN);
+        jwtService.isExpired(NON_JWT_ACCESS_TOKEN);
     }
 
     @Test
     public void checkGetPayloadFromValidToken() {
-        Assert.assertNotNull(jwtService.getTokenPayload(VALID_JWT_TOKEN));
+        Assert.assertNotNull(jwtService.getTokenPayload(VALID_ACCESS_JWT_TOKEN));
     }
 
     @Test(expected = JwtException.class)
@@ -97,7 +97,7 @@ public class JwtServiceTest extends SecurityJaxrsTestSupport {
 
     @Test(expected = JwtException.class)
     public void checkGetPayloadFromExpiredToken() {
-        jwtService.getTokenPayload(EXPIRED_JWT_TOKEN);
+        jwtService.getTokenPayload(EXPIRED_ACESS_JWT_TOKEN);
     }
 
     @Test(expected = JwtException.class)
@@ -112,6 +112,6 @@ public class JwtServiceTest extends SecurityJaxrsTestSupport {
 
     @Test(expected = JwtException.class)
     public void getPayloadFromNonJwtToken() {
-        jwtService.getTokenPayload(NON_JWT_TOKEN);
+        jwtService.getTokenPayload(NON_JWT_ACCESS_TOKEN);
     }
 }
