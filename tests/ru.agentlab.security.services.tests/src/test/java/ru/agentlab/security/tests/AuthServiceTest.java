@@ -5,6 +5,7 @@ import java.util.stream.Stream;
 import javax.inject.Inject;
 import javax.ws.rs.core.Form;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -44,7 +45,7 @@ public class AuthServiceTest extends SecurityJaxrsTestSupport {
     public void checkEmptyGrantType() {
         Form form = new Form();
         Response response = authService.grantOperation(form, null);
-        Assert.assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+        Assert.assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
     }
 
     @Test
@@ -54,7 +55,7 @@ public class AuthServiceTest extends SecurityJaxrsTestSupport {
                 GrantType.REFRESH_TOKEN.getValue());
 
         Response response = authService.grantOperation(form, null);
-        Assert.assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+        Assert.assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
     }
 
     // Password tests
@@ -70,7 +71,7 @@ public class AuthServiceTest extends SecurityJaxrsTestSupport {
 
         Response response = authService.grantOperation(form, null);
 
-        Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+        Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
         Assert.assertEquals(readFile(Wso2TestConstants.SUCCESS_TOKEN_RESPONSE_FILE), response.getEntity());
     }
 
@@ -84,7 +85,7 @@ public class AuthServiceTest extends SecurityJaxrsTestSupport {
 
         Response response = authService.grantOperation(form, null);
 
-        Assert.assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
+        Assert.assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
         Assert.assertEquals(readFile(Wso2TestConstants.AUTHENTICATION_FAILED_FOR_TESTUSER_FILE), response.getEntity());
     }
 
@@ -98,7 +99,7 @@ public class AuthServiceTest extends SecurityJaxrsTestSupport {
 
         Response response = authService.grantOperation(form, null);
 
-        Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+        Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
         Assert.assertEquals(readFile(Wso2TestConstants.SUCCESS_TOKEN_RESPONSE_FILE), response.getEntity());
     }
 
@@ -109,7 +110,7 @@ public class AuthServiceTest extends SecurityJaxrsTestSupport {
 
         Response response = authService.grantOperation(form, Wso2TestConstants.ACTIVE_REFRESH_TOKEN);
 
-        Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+        Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
         Assert.assertEquals(readFile(Wso2TestConstants.SUCCESS_TOKEN_RESPONSE_FILE), response.getEntity());
     }
 
@@ -121,7 +122,7 @@ public class AuthServiceTest extends SecurityJaxrsTestSupport {
 
         Response response = authService.grantOperation(form, null);
 
-        Assert.assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+        Assert.assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
         Assert.assertEquals(readFile(Wso2TestConstants.REFRESH_TOKEN_EXPIRED_RESPONSE_FILE), response.getEntity());
     }
 
@@ -132,7 +133,7 @@ public class AuthServiceTest extends SecurityJaxrsTestSupport {
 
         Response response = authService.grantOperation(form, Wso2TestConstants.EXPIRED_ACESS_JWT_TOKEN);
 
-        Assert.assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+        Assert.assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
         Assert.assertEquals(readFile(Wso2TestConstants.REFRESH_TOKEN_EXPIRED_RESPONSE_FILE), response.getEntity());
     }
 
@@ -143,7 +144,7 @@ public class AuthServiceTest extends SecurityJaxrsTestSupport {
 
         Response response = authService.grantOperation(form, null);
 
-        Assert.assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+        Assert.assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
     }
 
     @Test
@@ -153,7 +154,7 @@ public class AuthServiceTest extends SecurityJaxrsTestSupport {
 
         Response response = authService.grantOperation(form, null);
 
-        Assert.assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+        Assert.assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
     }
 
     @Test
@@ -164,7 +165,7 @@ public class AuthServiceTest extends SecurityJaxrsTestSupport {
 
         Response response = authService.grantOperation(form, Wso2TestConstants.ACTIVE_REFRESH_TOKEN);
 
-        Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+        Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
         Assert.assertEquals(readFile(Wso2TestConstants.SUCCESS_TOKEN_RESPONSE_FILE), response.getEntity());
     }
 
@@ -176,7 +177,7 @@ public class AuthServiceTest extends SecurityJaxrsTestSupport {
 
         Response response = authService.grantOperation(form, Wso2TestConstants.ACTIVE_REFRESH_TOKEN);
 
-        Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+        Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
         Assert.assertEquals(readFile(Wso2TestConstants.SUCCESS_TOKEN_RESPONSE_FILE), response.getEntity());
     }
 
@@ -188,7 +189,7 @@ public class AuthServiceTest extends SecurityJaxrsTestSupport {
 
         Response response = authService.grantOperation(form, Wso2TestConstants.EXPIRED_ACESS_JWT_TOKEN);
 
-        Assert.assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+        Assert.assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
         Assert.assertEquals(readFile(Wso2TestConstants.REFRESH_TOKEN_EXPIRED_RESPONSE_FILE), response.getEntity());
     }
 
@@ -200,7 +201,7 @@ public class AuthServiceTest extends SecurityJaxrsTestSupport {
 
         Response response = authService.grantOperation(form, Wso2TestConstants.EXPIRED_REFRESH_TOKEN);
 
-        Assert.assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+        Assert.assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
         Assert.assertEquals(readFile(Wso2TestConstants.REFRESH_TOKEN_EXPIRED_RESPONSE_FILE), response.getEntity());
     }
 
@@ -211,7 +212,7 @@ public class AuthServiceTest extends SecurityJaxrsTestSupport {
 
         Response response = authService.userInfo(null, null);
 
-        Assert.assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+        Assert.assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
     }
 
     @Test
@@ -219,7 +220,7 @@ public class AuthServiceTest extends SecurityJaxrsTestSupport {
 
         Response response = authService.userInfo(null, Wso2TestConstants.VALID_ACCESS_JWT_TOKEN);
 
-        Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+        Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
         Assert.assertEquals(readFile(Wso2TestConstants.USERINFO_SUCCESS_FILE), response.getEntity());
     }
 
@@ -228,7 +229,7 @@ public class AuthServiceTest extends SecurityJaxrsTestSupport {
 
         Response response = authService.userInfo(null, Wso2TestConstants.EXPIRED_ACESS_JWT_TOKEN);
 
-        Assert.assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
+        Assert.assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
     }
 
     @Test
@@ -236,7 +237,7 @@ public class AuthServiceTest extends SecurityJaxrsTestSupport {
 
         Response response = authService.userInfo(null, Wso2TestConstants.HACKED_ACCESS_JWT_TOKEN);
 
-        Assert.assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
+        Assert.assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
     }
 
     @Test
@@ -244,7 +245,7 @@ public class AuthServiceTest extends SecurityJaxrsTestSupport {
 
         Response response = authService.userInfo(null, Wso2TestConstants.NON_JWT_ACCESS_TOKEN);
 
-        Assert.assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
+        Assert.assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
     }
 
     @Test
@@ -252,7 +253,7 @@ public class AuthServiceTest extends SecurityJaxrsTestSupport {
 
         Response response = authService.userInfo(getBearerHeaderValue(Wso2TestConstants.VALID_ACCESS_JWT_TOKEN), null);
 
-        Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+        Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
         Assert.assertEquals(readFile(Wso2TestConstants.USERINFO_SUCCESS_FILE), response.getEntity());
     }
 
@@ -261,7 +262,7 @@ public class AuthServiceTest extends SecurityJaxrsTestSupport {
 
         Response response = authService.userInfo(getBearerHeaderValue(Wso2TestConstants.EXPIRED_ACESS_JWT_TOKEN), null);
 
-        Assert.assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
+        Assert.assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
     }
 
     @Test
@@ -269,7 +270,7 @@ public class AuthServiceTest extends SecurityJaxrsTestSupport {
 
         Response response = authService.userInfo(getBearerHeaderValue(Wso2TestConstants.HACKED_ACCESS_JWT_TOKEN), null);
 
-        Assert.assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
+        Assert.assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
     }
 
     @Test
@@ -277,7 +278,7 @@ public class AuthServiceTest extends SecurityJaxrsTestSupport {
 
         Response response = authService.userInfo(getBearerHeaderValue(Wso2TestConstants.NON_JWT_ACCESS_TOKEN), null);
 
-        Assert.assertEquals(Response.Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
+        Assert.assertEquals(Status.UNAUTHORIZED.getStatusCode(), response.getStatus());
     }
 
     @Test
@@ -285,7 +286,7 @@ public class AuthServiceTest extends SecurityJaxrsTestSupport {
 
         Response response = authService.userInfo(Wso2TestConstants.NON_JWT_ACCESS_TOKEN, null);
 
-        Assert.assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+        Assert.assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
     }
 
     @Test
@@ -294,7 +295,7 @@ public class AuthServiceTest extends SecurityJaxrsTestSupport {
         Response response = authService.userInfo(getBearerHeaderValue(Wso2TestConstants.EXPIRED_ACESS_JWT_TOKEN),
                 Wso2TestConstants.VALID_ACCESS_JWT_TOKEN);
 
-        Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+        Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
         Assert.assertEquals(readFile(Wso2TestConstants.USERINFO_SUCCESS_FILE), response.getEntity());
     }
 
@@ -309,8 +310,8 @@ public class AuthServiceTest extends SecurityJaxrsTestSupport {
 
         Response response = authService.grantOperation(form, null);
 
-        Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-        Assert.assertEquals(readFile(Wso2TestConstants.CODE_GRANT_ACTIVE_CODE_RESPONSE_FILE), response.getEntity());
+        Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        Assert.assertEquals(readFile(Wso2TestConstants.TOKENS_RESPONSE_FILE), response.getEntity());
     }
 
     @Test
@@ -322,7 +323,7 @@ public class AuthServiceTest extends SecurityJaxrsTestSupport {
 
         Response response = authService.grantOperation(form, null);
 
-        Assert.assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+        Assert.assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
         Assert.assertEquals(readFile(Wso2TestConstants.CODE_GRANT_INACTIVE_CODE_RESPONSE_FILE), response.getEntity());
     }
 
@@ -334,7 +335,7 @@ public class AuthServiceTest extends SecurityJaxrsTestSupport {
 
         Response response = authService.grantOperation(form, null);
 
-        Assert.assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+        Assert.assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
     }
 
     @Test
@@ -345,7 +346,44 @@ public class AuthServiceTest extends SecurityJaxrsTestSupport {
 
         Response response = authService.grantOperation(form, null);
 
-        Assert.assertEquals(Response.Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+        Assert.assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+    }
+
+    // device flow tests
+
+    @Test
+    public void checkGrantDeviceRequestAuthData() {
+        Form form = new Form();
+        Response response = authService.getDeviceGrantInfo(form);
+
+        Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        Assert.assertEquals(readFile(Wso2TestConstants.DEVICE_GRANT_AUTH_DATA_RESPONSE_FILE), response.getEntity());
+
+    }
+
+    @Test
+    public void checkGrantDeviceExpiredCode() {
+        Form form = new Form();
+        form.param(Wso2TestConstants.GRANT_TYPE, GrantType.DEVICE_CODE.getValue())
+                .param(GrantType.DEVICE_CODE.getValue(), Wso2TestConstants.DEVICE_GRANT_EXPIRED_DEVICE_CODE);
+
+        Response response = authService.grantOperation(form, null);
+
+        Assert.assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+        Assert.assertEquals(readFile(Wso2TestConstants.DEVICE_GRANT_EXPIRED_CODE_RESPONSE_FILE), response.getEntity());
+
+    }
+
+    @Test
+    public void checkGrantDeviceActiveCode() {
+        Form form = new Form();
+        form.param(Wso2TestConstants.GRANT_TYPE, GrantType.DEVICE_CODE.getValue())
+                .param(GrantType.DEVICE_CODE.getValue(), Wso2TestConstants.DEVICE_GRANT_VALID_DEVICE_CODE);
+
+        Response response = authService.grantOperation(form, null);
+
+        Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        Assert.assertEquals(readFile(Wso2TestConstants.TOKENS_RESPONSE_FILE), response.getEntity());
     }
 
     private String getBearerHeaderValue(String token) {

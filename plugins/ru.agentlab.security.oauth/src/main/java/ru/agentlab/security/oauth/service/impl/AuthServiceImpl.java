@@ -33,6 +33,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -113,7 +114,7 @@ public class AuthServiceImpl implements IAuthService {
         List<String> grantTypes = formParams.get("grant_type");
 
         if (grantTypes == null || grantTypes.isEmpty() || grantTypes.size() > 2) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
+            return Response.status(Status.BAD_REQUEST).build();
         }
 
         GrantType grantType = null;
@@ -122,7 +123,7 @@ public class AuthServiceImpl implements IAuthService {
             grantType = GrantType.parse(grantTypes.get(0));
         } catch (ParseException e) {
             LOGGER.error(e.getMessage(), e);
-            return Response.status(Response.Status.BAD_REQUEST).build();
+            return Response.status(Status.BAD_REQUEST).build();
         }
 
         if (GrantType.PASSWORD.equals(grantType)) {
@@ -135,7 +136,7 @@ public class AuthServiceImpl implements IAuthService {
             return authorizationCodeGrantFlow(form);
         }
 
-        return Response.status(Response.Status.BAD_REQUEST).build();
+        return Response.status(Status.BAD_REQUEST).build();
     }
 
     @Override
@@ -151,7 +152,7 @@ public class AuthServiceImpl implements IAuthService {
             return Response.ok().entity(info.get()).build();
         }
 
-        return Response.status(Response.Status.BAD_REQUEST).build();
+        return Response.status(Status.BAD_REQUEST).build();
     }
 
     @Override
@@ -167,7 +168,7 @@ public class AuthServiceImpl implements IAuthService {
         String tokenType = formParams.getFirst(OAuthConstants.TOKEN_TYPE_HINT);
 
         if (Strings.isNullOrEmpty(tokenType)) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
+            return Response.status(Status.BAD_REQUEST).build();
         }
 
         String tokenFromForm = formParams.getFirst(OAuthConstants.TOKEN);
@@ -178,7 +179,7 @@ public class AuthServiceImpl implements IAuthService {
         if (OAuthConstants.ACCESS_TOKEN.equals(tokenType)) {
             String accessToken = isNullOrEmpty(accessTokenCookie) ? tokenFromForm : accessTokenCookie;
             if (isNullOrEmpty(accessToken)) {
-                return Response.status(Response.Status.BAD_REQUEST).build();
+                return Response.status(Status.BAD_REQUEST).build();
             } else {
                 token = new BearerAccessToken(accessToken);
                 resetCookie = createTokenCookie(OAuthConstants.ACCESS_TOKEN, "", 0);
@@ -186,13 +187,13 @@ public class AuthServiceImpl implements IAuthService {
         } else if (OAuthConstants.REFRESH_TOKEN.equals(tokenType)) {
             String refreshToken = isNullOrEmpty(refreshTokenCookie) ? tokenFromForm : refreshTokenCookie;
             if (isNullOrEmpty(refreshToken)) {
-                return Response.status(Response.Status.BAD_REQUEST).build();
+                return Response.status(Status.BAD_REQUEST).build();
             } else {
                 token = new RefreshToken(refreshToken);
                 resetCookie = createTokenCookie(OAuthConstants.REFRESH_TOKEN, "", 0);
             }
         } else {
-            return Response.status(Response.Status.BAD_REQUEST).build();
+            return Response.status(Status.BAD_REQUEST).build();
         }
 
         TokenRevocationRequest revokeRequest = new TokenRevocationRequest(authServerProvider.getRevocationEndpointURI(),
@@ -207,7 +208,7 @@ public class AuthServiceImpl implements IAuthService {
             return Response.status(response.getStatusCode()).entity(response.getContent()).build();
         } catch (IOException e) {
             LOGGER.error(e.getMessage(), e);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+            return Response.status(Status.INTERNAL_SERVER_ERROR).build();
         }
     }
 
@@ -230,7 +231,7 @@ public class AuthServiceImpl implements IAuthService {
                 }));
 
         if (accessToken.isEmpty()) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
+            return Response.status(Status.BAD_REQUEST).build();
         }
 
         try {
@@ -240,14 +241,14 @@ public class AuthServiceImpl implements IAuthService {
 
             if (!userInfoResponse.indicatesSuccess()) {
                 ErrorObject errorObject = userInfoResponse.toErrorResponse().getErrorObject();
-                return Response.status(Response.Status.UNAUTHORIZED).entity(errorObject.getDescription()).build();
+                return Response.status(Status.UNAUTHORIZED).entity(errorObject.getDescription()).build();
             }
 
             return Response.ok().entity(userInfoResponse.toSuccessResponse().getUserInfo().toJSONString()).build();
 
         } catch (IOException | ParseException e) {
             LOGGER.error(e.getMessage(), e);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+            return Response.status(Status.INTERNAL_SERVER_ERROR).build();
         }
     }
 
@@ -256,7 +257,7 @@ public class AuthServiceImpl implements IAuthService {
         String password = form.asMap().getFirst("password");
 
         if (isBadRequest(username, password)) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
+            return Response.status(Status.BAD_REQUEST).build();
         }
 
         AuthorizationGrant passwordGrant = new ResourceOwnerPasswordCredentialsGrant(username, new Secret(password));
@@ -270,7 +271,7 @@ public class AuthServiceImpl implements IAuthService {
                 .orElse(form.asMap().getFirst(OAuthConstants.REFRESH_TOKEN));
 
         if (isBadRequest(refreshToken)) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
+            return Response.status(Status.BAD_REQUEST).build();
         }
 
         return performAuthorizationGrantOperation(new RefreshTokenGrant(new RefreshToken(refreshToken)), null);
@@ -280,7 +281,7 @@ public class AuthServiceImpl implements IAuthService {
         String deviceCode = form.asMap().getFirst(GrantType.DEVICE_CODE.getValue());
 
         if (isBadRequest(deviceCode)) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
+            return Response.status(Status.BAD_REQUEST).build();
         }
 
         AuthorizationGrant deviceGrant = new DeviceCodeGrant(new DeviceCode(deviceCode));
@@ -294,7 +295,7 @@ public class AuthServiceImpl implements IAuthService {
         String codeChallenge = form.asMap().getFirst("code_challenge");
 
         if (isBadRequest(code, redirectUriRaw)) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
+            return Response.status(Status.BAD_REQUEST).build();
         }
 
         URI redirectUri;
@@ -303,7 +304,7 @@ public class AuthServiceImpl implements IAuthService {
             redirectUri = new URI(redirectUriRaw);
         } catch (URISyntaxException e) {
             LOGGER.error(e.getMessage(), e);
-            return Response.status(Response.Status.BAD_REQUEST).build();
+            return Response.status(Status.BAD_REQUEST).build();
         }
 
         CodeVerifier codeVerifier = codeChallenge != null ? new CodeVerifier(codeChallenge) : null;
@@ -328,7 +329,9 @@ public class AuthServiceImpl implements IAuthService {
         HttpPost httpPost = new HttpPost(authServerProvider.getDeviceAuthorizationEndpointURI());
 
         List<NameValuePair> params = new ArrayList<NameValuePair>();
-        params.add(new BasicNameValuePair("scope", getRequestedScopes(form).toString()));
+        Scope scopes = getRequestedScopes(form);
+        if (!scopes.isEmpty())
+            params.add(new BasicNameValuePair("scope", scopes.toString()));
         params.add(new BasicNameValuePair("client_id", clientAuthPost.getClientID().getValue()));
         params.add(new BasicNameValuePair("client_secret", clientAuthPost.getClientSecret().getValue()));
 
@@ -339,7 +342,7 @@ public class AuthServiceImpl implements IAuthService {
         }
 
         try (CloseableHttpResponse response = httpClientProvider.getClient().execute(httpPost)) {
-            if (response.getStatusLine().getStatusCode() == Response.Status.OK.getStatusCode()) {
+            if (response.getStatusLine().getStatusCode() == Status.OK.getStatusCode()) {
                 String responseString = new BasicResponseHandler().handleResponse(response);
                 return Optional.ofNullable(responseString);
             }
@@ -366,7 +369,7 @@ public class AuthServiceImpl implements IAuthService {
             response = TokenResponse.parse(request.toHTTPRequest().send());
         } catch (IOException | ParseException e) {
             LOGGER.error(e.getMessage(), e);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+            return Response.status(Status.INTERNAL_SERVER_ERROR).build();
         }
 
         if (!response.indicatesSuccess()) {

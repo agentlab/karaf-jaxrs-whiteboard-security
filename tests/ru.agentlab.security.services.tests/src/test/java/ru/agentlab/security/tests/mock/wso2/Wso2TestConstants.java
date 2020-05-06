@@ -46,12 +46,18 @@ public class Wso2TestConstants {
     public static final String ACTIVE_REFRESH_TOKEN = "f6351bad-ec29-3c2d-869d-7264d81d505c";
     public static final String EXPIRED_REFRESH_TOKEN = "f6351bad-ec29-3c2d-869d-7264d81d505e";
 
+    public static final String DEVICE_GRANT_VALID_DEVICE_CODE = "a397b9fd-5460-4928-b180-4b4373ab1bde";
+    public static final String DEVICE_GRANT_EXPIRED_DEVICE_CODE = "a397b9fd-5460-4928-b180-4b4373ab1bee";
+
     public static final String SUCCESS_TOKEN_RESPONSE_FILE = "success-token-response.json";
     public static final String AUTHENTICATION_FAILED_FOR_TESTUSER_FILE = "authentication-failed-for-testuser.json";
     public static final String REFRESH_TOKEN_EXPIRED_RESPONSE_FILE = "refresh-token-expired-response.json";
     public static final String USERINFO_ACCESS_TOKEN_VALIDATION_FAILED_FILE = "userinfo-access-token-validation-failed.json";
     public static final String USERINFO_SUCCESS_FILE = "userinfo-success.json";
     public static final String USERINFO_TOKEN_MISSING_FILE = "userinfo-token-missing.json";
-    public static final String CODE_GRANT_ACTIVE_CODE_RESPONSE_FILE = "code-grant-active-code-response.json";
     public static final String CODE_GRANT_INACTIVE_CODE_RESPONSE_FILE = "code-grant-inactive-code-response.json";
+    public static final String DEVICE_GRANT_AUTH_DATA_RESPONSE_FILE = "device-grant-auth-data-response.json";
+    public static final String DEVICE_GRANT_EXPIRED_CODE_RESPONSE_FILE = "device-grant-expired-code-response.json";
+
+    public static final String TOKENS_RESPONSE_FILE = "tokens-response.json";
 }

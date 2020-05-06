@@ -33,6 +33,7 @@ public class Wso2ExpectationInitializer implements PluginExpectationInitializer 
         mockRefreshToken(mockServerClient);
         mockUserInfo(mockServerClient);
         mockCodeFlow(mockServerClient);
+        mockDeviceFlow(mockServerClient);
     }
 
     private MockServerClient mockOpenIdConfig(MockServerClient mockServerClient) {
@@ -334,6 +335,71 @@ public class Wso2ExpectationInitializer implements PluginExpectationInitializer 
         return mockServerClient;
     }
 
+    private MockServerClient mockDeviceFlow(MockServerClient mockServerClient) {
+        // @formatter:off
+        mockServerClient
+            .when(request()
+                    .withMethod("POST")
+                    .withContentType(MediaType.APPLICATION_FORM_URLENCODED)
+                    .withPath("/oauth2/device_authorize")
+                    .withBody(
+                            params(
+                                    getClientIdParam(),
+                                    getClientSecretParam()
+                                    )
+                            )
+                    )
+            .respond(response()
+                    .withStatusCode(OK_200.code())
+                    .withContentType(MediaType.APPLICATION_JSON)
+                    .withBody(new JsonBody(getDeviceGrantAuthDataFileResponse())));
+        // @formatter:on
+
+        // @formatter:off
+        mockServerClient
+            .when(request()
+                    .withMethod("POST")
+                    .withContentType(MediaType.APPLICATION_FORM_URLENCODED.withCharset(StandardCharsets.UTF_8))
+                    .withPath("/oauth2/token")
+                    .withBody(
+                            params(
+                                    param(Wso2TestConstants.GRANT_TYPE, GrantType.DEVICE_CODE.getValue()),
+                                    getValidDeviceCodeParam(Wso2TestConstants.DEVICE_GRANT_VALID_DEVICE_CODE),
+                                    getClientIdParam(),
+                                    getClientSecretParam()
+                                    )
+                            )
+                    )
+            .respond(response()
+                    .withStatusCode(OK_200.code())
+                    .withContentType(MediaType.APPLICATION_JSON)
+                    .withBody(new JsonBody(getDeviceGrantActiveCodeResponseFile())));
+        // @formatter:on
+
+        // @formatter:off
+        mockServerClient
+            .when(request()
+                    .withMethod("POST")
+                    .withContentType(MediaType.APPLICATION_FORM_URLENCODED.withCharset(StandardCharsets.UTF_8))
+                    .withPath("/oauth2/token")
+                    .withBody(
+                            params(
+                                    param(Wso2TestConstants.GRANT_TYPE, GrantType.DEVICE_CODE.getValue()),
+                                    getValidDeviceCodeParam(Wso2TestConstants.DEVICE_GRANT_EXPIRED_DEVICE_CODE),
+                                    getClientIdParam(),
+                                    getClientSecretParam()
+                                    )
+                            )
+                    )
+            .respond(response()
+                    .withStatusCode(BAD_REQUEST_400.code())
+                    .withContentType(MediaType.APPLICATION_JSON)
+                    .withBody(new JsonBody(getDeviceGrantExpiredCodeResponseFile())));
+        // @formatter:on
+
+        return mockServerClient;
+    }
+
     private Parameter getClientIdParam() {
         return param("client_id", Wso2TestConstants.CLIENT_ID);
     }
@@ -344,6 +410,10 @@ public class Wso2ExpectationInitializer implements PluginExpectationInitializer 
 
     private Parameter getOpenIdParam() {
         return param(Wso2TestConstants.SCOPE, Wso2TestConstants.OPENID);
+    }
+
+    private Parameter getValidDeviceCodeParam(String deviceCode) {
+        return param("device_code", deviceCode);
     }
 
     private String getSuccessTokenResponse() throws UncheckedIOException {
@@ -371,11 +441,23 @@ public class Wso2ExpectationInitializer implements PluginExpectationInitializer 
     }
 
     private String getCodeFlowActiveCodeResponse() {
-        return readFileFromResourses(Wso2TestConstants.CODE_GRANT_ACTIVE_CODE_RESPONSE_FILE);
+        return readFileFromResourses(Wso2TestConstants.TOKENS_RESPONSE_FILE);
     }
 
     private String getCodeFlowInactiveCodeResponse() {
         return readFileFromResourses(Wso2TestConstants.CODE_GRANT_INACTIVE_CODE_RESPONSE_FILE);
+    }
+
+    private String getDeviceGrantAuthDataFileResponse() {
+        return readFileFromResourses(Wso2TestConstants.DEVICE_GRANT_AUTH_DATA_RESPONSE_FILE);
+    }
+
+    private String getDeviceGrantExpiredCodeResponseFile() {
+        return readFileFromResourses(Wso2TestConstants.DEVICE_GRANT_EXPIRED_CODE_RESPONSE_FILE);
+    }
+
+    private String getDeviceGrantActiveCodeResponseFile() {
+        return readFileFromResourses(Wso2TestConstants.TOKENS_RESPONSE_FILE);
     }
 
     private String readFileFromResourses(String fileName) throws UncheckedIOException {
