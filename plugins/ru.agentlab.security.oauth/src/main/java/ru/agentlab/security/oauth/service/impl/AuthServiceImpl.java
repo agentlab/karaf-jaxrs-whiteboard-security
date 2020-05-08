@@ -85,6 +85,17 @@ public class AuthServiceImpl implements IAuthService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AuthServiceImpl.class);
 
+    private static final String OAUTH_COOKIE_PATH = System.getProperty("ru.agentlab.security.oauth.cookie.path",
+            getEnv("OAUTH_COOKIE_PATH", String.class, "/"));
+    private static final String OAUTH_COOKIE_DOMAIN = System.getProperty("ru.agentlab.security.oauth.cookie.domain",
+            getEnv("OAUTH_COOKIE_DOMAIN", String.class, null));
+    private static final int OAUTH_COOKIE_EXPIRE_ACCESS_TOKEN = Integer.getInteger(
+            "ru.agentlab.security.oauth.cookie.expire.access_token",
+            getEnv("OAUTH_COOKIE_EXPIRE_ACCESS_TOKEN", Integer.class, 3600));
+    private static final int OAUTH_COOKIE_EXPIRE_REFRESH_TOKEN = Integer.getInteger(
+            "ru.agentlab.security.oauth.cookie.expire.refresh_token",
+            getEnv("OAUTH_COOKIE_EXPIRE_REFRESH_TOKEN", Integer.class, 86400));
+
     private final ClientSecretPost clientAuthPost;
 
     @Reference
@@ -93,10 +104,10 @@ public class AuthServiceImpl implements IAuthService {
     private IHttpClientProvider httpClientProvider;
 
     public AuthServiceImpl() {
-        ClientID clientId = new ClientID(
-                getProperty("ru.agentlab.oauth20.client.id", getEnv("CLIENT_ID", "Ynio_EuYVk8j2gn_6nUbIVQbj_Aa")));
-        Secret clientSecret = new Secret(getProperty("ru.agentlab.oauth20.client.secret",
-                getEnv("CLIENT_SECRET", "fTJGvvfJjUkWvn8R_NY8zXSyYQ0a")));
+        ClientID clientId = new ClientID(getProperty("ru.agentlab.oauth.client.id",
+                getEnv("OAUTH_CLIENT_ID", String.class, "Ynio_EuYVk8j2gn_6nUbIVQbj_Aa")));
+        Secret clientSecret = new Secret(getProperty("ru.agentlab.oauth.client.secret",
+                getEnv("OAUTH_CLIENT_SECRET", String.class, "fTJGvvfJjUkWvn8R_NY8zXSyYQ0a")));
 
         clientAuthPost = new ClientSecretPost(clientId, clientSecret);
 
@@ -354,9 +365,18 @@ public class AuthServiceImpl implements IAuthService {
         return Optional.empty();
     }
 
-    private static String getEnv(String key, String defValue) {
-        String value = System.getenv(key);
-        return value != null ? value : defValue;
+    private static <T> T getEnv(String key, Class<T> clazz, T def) {
+        String envValue = System.getenv(key);
+        if (envValue != null) {
+            try {
+                if (Integer.class.equals(clazz) || String.class.equals(clazz)) {
+                    return clazz.getDeclaredConstructor(String.class).newInstance(envValue);
+                }
+            } catch (Exception e) {
+                LOGGER.error(e.getMessage(), e);
+            }
+        }
+        return def;
     }
 
     private Response performAuthorizationGrantOperation(AuthorizationGrant grant, Scope scopes) {
@@ -392,9 +412,10 @@ public class AuthServiceImpl implements IAuthService {
         Preconditions.checkArgument(accessToken != null);
         Preconditions.checkArgument(refreshToken != null);
 
-        // TODO: expire time
-        NewCookie accessTokenCookie = createTokenCookie(OAuthConstants.ACCESS_TOKEN, accessToken, 3600);
-        NewCookie refreshTokenCookie = createTokenCookie(OAuthConstants.REFRESH_TOKEN, refreshToken, 86400);
+        NewCookie accessTokenCookie = createTokenCookie(OAuthConstants.ACCESS_TOKEN, accessToken,
+                OAUTH_COOKIE_EXPIRE_ACCESS_TOKEN);
+        NewCookie refreshTokenCookie = createTokenCookie(OAuthConstants.REFRESH_TOKEN, refreshToken,
+                OAUTH_COOKIE_EXPIRE_REFRESH_TOKEN);
 
         return List.of(accessTokenCookie, refreshTokenCookie);
     }
@@ -402,8 +423,8 @@ public class AuthServiceImpl implements IAuthService {
     private NewCookie createTokenCookie(String tokenTypeHint, String token, int maxAge) {
         Calendar expireTime = Calendar.getInstance();
         expireTime.add(Calendar.SECOND, maxAge);
-        return new NewCookie(tokenTypeHint, token, "/", null, NewCookie.DEFAULT_VERSION, null, maxAge,
-                expireTime.getTime(), false, true);
+        return new NewCookie(tokenTypeHint, token, OAUTH_COOKIE_PATH, OAUTH_COOKIE_DOMAIN, NewCookie.DEFAULT_VERSION,
+                null, maxAge, expireTime.getTime(), false, true);
     }
 
     private boolean isBadRequest(String... params) {

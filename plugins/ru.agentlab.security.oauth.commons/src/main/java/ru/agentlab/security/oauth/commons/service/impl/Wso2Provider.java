@@ -1,11 +1,11 @@
 package ru.agentlab.security.oauth.commons.service.impl;
 
+import static java.lang.System.getProperty;
+
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URISyntaxException;
-
-import static java.lang.System.getProperty;
 
 import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
