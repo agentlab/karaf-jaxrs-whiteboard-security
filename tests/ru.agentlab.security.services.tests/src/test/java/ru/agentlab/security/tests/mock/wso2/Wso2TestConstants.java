@@ -35,6 +35,9 @@ public class Wso2TestConstants {
     public static final String CODE = "code";
     public static final String REDIRECT_URI = "redirect_uri";
     public static final String REDIRECT_URI_VALUE = "http://example.com:3000/oauth20/callback";
+    public static final String ACCESS_TOKEN = "access_token";
+    public static final String TOKEN_TYPE_HINT = "token_type_hint";
+    public static final String TOKEN = "token";
 
     public static final String ACTIVE_CODE = "9add73e1-6281-3e35-9841-7615f35a2f5d";
     public static final String INACTIVE_CODE = "8add73e1-6281-3e35-9841-7615f35a2f5d";

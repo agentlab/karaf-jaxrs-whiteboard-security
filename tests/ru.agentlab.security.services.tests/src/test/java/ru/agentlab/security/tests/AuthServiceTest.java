@@ -358,7 +358,6 @@ public class AuthServiceTest extends SecurityJaxrsTestSupport {
 
         Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
         Assert.assertEquals(readFile(Wso2TestConstants.DEVICE_GRANT_AUTH_DATA_RESPONSE_FILE), response.getEntity());
-
     }
 
     @Test
@@ -371,7 +370,6 @@ public class AuthServiceTest extends SecurityJaxrsTestSupport {
 
         Assert.assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
         Assert.assertEquals(readFile(Wso2TestConstants.DEVICE_GRANT_EXPIRED_CODE_RESPONSE_FILE), response.getEntity());
-
     }
 
     @Test
@@ -384,6 +382,73 @@ public class AuthServiceTest extends SecurityJaxrsTestSupport {
 
         Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
         Assert.assertEquals(readFile(Wso2TestConstants.TOKENS_RESPONSE_FILE), response.getEntity());
+    }
+
+    // revoke token tests
+
+    @Test
+    public void checkRevokeTokenBadRequest() {
+        Form form = new Form();
+        Response response = authService.revokeToken(form, null, null);
+
+        Assert.assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+
+        form = new Form(Wso2TestConstants.TOKEN_TYPE_HINT, "TRASH");
+        response = authService.revokeToken(form, null, null);
+        Assert.assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+
+        form = new Form(Wso2TestConstants.TOKEN_TYPE_HINT, Wso2TestConstants.REFRESH_TOKEN);
+        response = authService.revokeToken(form, null, null);
+        Assert.assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+
+        form = new Form(Wso2TestConstants.TOKEN_TYPE_HINT, Wso2TestConstants.ACCESS_TOKEN);
+        response = authService.revokeToken(form, null, null);
+        Assert.assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+    }
+
+    @Test
+    public void checkRevokeTokenWithCookies() {
+        Form form = new Form(Wso2TestConstants.TOKEN_TYPE_HINT, Wso2TestConstants.ACCESS_TOKEN);
+        Response response = authService.revokeToken(form, Wso2TestConstants.VALID_ACCESS_JWT_TOKEN,
+                Wso2TestConstants.ACTIVE_REFRESH_TOKEN);
+        Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        Assert.assertEquals("", response.getCookies().get(Wso2TestConstants.ACCESS_TOKEN).getValue());
+
+        form = new Form(Wso2TestConstants.TOKEN_TYPE_HINT, Wso2TestConstants.REFRESH_TOKEN);
+        response = authService.revokeToken(form, Wso2TestConstants.VALID_ACCESS_JWT_TOKEN,
+                Wso2TestConstants.ACTIVE_REFRESH_TOKEN);
+        Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        Assert.assertEquals("", response.getCookies().get(Wso2TestConstants.REFRESH_TOKEN).getValue());
+    }
+
+    @Test
+    public void checkRevokeTokenWithoutCookies() {
+        Form form = new Form(Wso2TestConstants.TOKEN_TYPE_HINT, Wso2TestConstants.ACCESS_TOKEN);
+        form.param(Wso2TestConstants.TOKEN, Wso2TestConstants.TOKEN);
+        Response response = authService.revokeToken(form, null, null);
+        Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
+
+        form = new Form(Wso2TestConstants.TOKEN_TYPE_HINT, Wso2TestConstants.REFRESH_TOKEN);
+        form.param(Wso2TestConstants.TOKEN, Wso2TestConstants.TOKEN);
+        response = authService.revokeToken(form, null, null);
+        Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
+    }
+
+    @Test
+    public void checkRevokeTokenCombine() {
+        Form form = new Form(Wso2TestConstants.TOKEN_TYPE_HINT, Wso2TestConstants.ACCESS_TOKEN);
+        form.param(Wso2TestConstants.TOKEN, Wso2TestConstants.TOKEN);
+        Response response = authService.revokeToken(form, Wso2TestConstants.VALID_ACCESS_JWT_TOKEN,
+                Wso2TestConstants.ACTIVE_REFRESH_TOKEN);
+        Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        Assert.assertEquals("", response.getCookies().get(Wso2TestConstants.ACCESS_TOKEN).getValue());
+
+        form = new Form(Wso2TestConstants.TOKEN_TYPE_HINT, Wso2TestConstants.REFRESH_TOKEN);
+        form.param(Wso2TestConstants.TOKEN, Wso2TestConstants.TOKEN);
+        response = authService.revokeToken(form, Wso2TestConstants.VALID_ACCESS_JWT_TOKEN,
+                Wso2TestConstants.ACTIVE_REFRESH_TOKEN);
+        Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
+        Assert.assertEquals("", response.getCookies().get(Wso2TestConstants.REFRESH_TOKEN).getValue());
     }
 
     private String getBearerHeaderValue(String token) {

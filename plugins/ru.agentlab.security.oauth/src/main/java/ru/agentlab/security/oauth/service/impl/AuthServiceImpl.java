@@ -205,10 +205,10 @@ public class AuthServiceImpl implements IAuthService {
                 return Response.ok().cookie(resetCookie).build();
             }
 
-            return Response.status(response.getStatusCode()).entity(response.getContent()).build();
+            return Response.status(response.getStatusCode()).entity(response.getContent()).cookie(resetCookie).build();
         } catch (IOException e) {
             LOGGER.error(e.getMessage(), e);
-            return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+            return Response.status(Status.INTERNAL_SERVER_ERROR).cookie(resetCookie).build();
         }
     }
 

@@ -34,6 +34,7 @@ public class Wso2ExpectationInitializer implements PluginExpectationInitializer 
         mockUserInfo(mockServerClient);
         mockCodeFlow(mockServerClient);
         mockDeviceFlow(mockServerClient);
+        mockRevokeRequest(mockServerClient);
     }
 
     private MockServerClient mockOpenIdConfig(MockServerClient mockServerClient) {
@@ -395,6 +396,18 @@ public class Wso2ExpectationInitializer implements PluginExpectationInitializer 
                     .withStatusCode(BAD_REQUEST_400.code())
                     .withContentType(MediaType.APPLICATION_JSON)
                     .withBody(new JsonBody(getDeviceGrantExpiredCodeResponseFile())));
+        // @formatter:on
+
+        return mockServerClient;
+    }
+
+    private MockServerClient mockRevokeRequest(MockServerClient mockServerClient) {
+        // @formatter:off
+        mockServerClient
+            .when(request()
+                    .withMethod("POST")
+                    .withPath("/oauth2/revoke"))
+            .respond(response().withStatusCode(OK_200.code()));
         // @formatter:on
 
         return mockServerClient;
