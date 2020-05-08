@@ -51,3 +51,19 @@ Or you colud install sub-features one by one:
 
 * `./bin/karaf debug` -- allows to attach with debugger on 5005 port
 
+## Settings
+
+|                     System property                    |                ENV                |          Default value         |
+|:------------------------------------------------------:|:---------------------------------:|:------------------------------:|
+| ru.agentlab.security.oauth.cookie.path                 |         OAUTH_COOKIE_PATH         |               "/"              |
+| ru.agentlab.security.oauth.cookie.domain               |        OAUTH_COOKIE_DOMAIN        |              null              |
+| ru.agentlab.security.oauth.cookie.expire.access_token  |  OAUTH_COOKIE_EXPIRE_ACCESS_TOKEN |              3600              |
+| ru.agentlab.security.oauth.cookie.expire.refresh_token | OAUTH_COOKIE_EXPIRE_REFRESH_TOKEN |              86400             |
+| ru.agentlab.oauth.client.id                            |          OAUTH_CLIENT_ID          | "Ynio_EuYVk8j2gn_6nUbIVQbj_Aa" |
+| ru.agentlab.oauth.client.secret                        |        OAUTH_CLIENT_SECRET        | "fTJGvvfJjUkWvn8R_NY8zXSyYQ0a" |
+|                                                        |                                   |                                |
+| ru.agentlab.wso2.protocol                              |           WSO2_PROTOCOL           |             "https"            |
+| ru.agentlab.wso2.host                                  |             WSO2_HOST             |           "localhost"          |
+| ru.agentlab.wso2.port                                  |             WSO2_PORT             |             "9443"             |
+| ru.agentlab.wso2.prefix                                |            WSO2_PREFIX            |               ""               |
+| ru.agentlab.ssl.verification.enabled                   |      SSL_VERIFICATION_ENABLED     |              false             |

@@ -25,34 +25,48 @@ import ru.agentlab.security.oauth.commons.service.IHttpClientProvider;
 
 @Component
 public class HttpClientProvider implements IHttpClientProvider {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpClientProvider.class);
 
     private CloseableHttpClient httpClient;
 
     public HttpClientProvider() {
-        try {
-            TrustStrategy acceptingTrustStrategy = (cert, authType) -> true;
-            SSLContext sslContext = SSLContexts.custom().loadTrustMaterial(null, acceptingTrustStrategy).build();
-            SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslContext,
-                    NoopHostnameVerifier.INSTANCE);
 
-            Registry<ConnectionSocketFactory> socketFactoryRegistry = RegistryBuilder.<ConnectionSocketFactory>create()
-                    .register("https", sslsf).register("http", new PlainConnectionSocketFactory()).build();
+        httpClient = HttpClients.createDefault();
 
-            BasicHttpClientConnectionManager connectionManager = new BasicHttpClientConnectionManager(
-                    socketFactoryRegistry);
-            httpClient = HttpClients.custom().setSSLSocketFactory(sslsf).setConnectionManager(connectionManager)
-                    .build();
+        if (!isSslVerificationEnabled()) {
+            try {
+                TrustStrategy acceptingTrustStrategy = (cert, authType) -> true;
+                SSLContext sslContext = SSLContexts.custom().loadTrustMaterial(null, acceptingTrustStrategy).build();
+                SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslContext,
+                        NoopHostnameVerifier.INSTANCE);
 
-        } catch (KeyManagementException | NoSuchAlgorithmException | KeyStoreException e) {
-            LOGGER.error(e.getMessage(), e);
-            httpClient = HttpClients.createDefault();
+                Registry<ConnectionSocketFactory> socketFactoryRegistry = RegistryBuilder
+                        .<ConnectionSocketFactory>create().register("https", sslsf)
+                        .register("http", new PlainConnectionSocketFactory()).build();
+
+                BasicHttpClientConnectionManager connectionManager = new BasicHttpClientConnectionManager(
+                        socketFactoryRegistry);
+                httpClient = HttpClients.custom().setSSLSocketFactory(sslsf).setConnectionManager(connectionManager)
+                        .build();
+
+            } catch (KeyManagementException | NoSuchAlgorithmException | KeyStoreException e) {
+                LOGGER.error(e.getMessage(), e);
+                httpClient = HttpClients.createDefault();
+            }
         }
     }
 
     @Override
     public CloseableHttpClient getClient() {
         return httpClient;
+    }
+
+    private static boolean isSslVerificationEnabled() {
+        if (!Boolean.getBoolean("ru.agentlab.ssl.verification.enabled")) {
+            return Boolean.parseBoolean(System.getProperty("SSL_VERIFICATION_ENABLED"));
+        }
+        return true;
     }
 
 }

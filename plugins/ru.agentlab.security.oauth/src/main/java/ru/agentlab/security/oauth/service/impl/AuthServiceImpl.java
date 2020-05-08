@@ -111,7 +111,8 @@ public class AuthServiceImpl implements IAuthService {
 
         clientAuthPost = new ClientSecretPost(clientId, clientSecret);
 
-        disableSSLVerification();
+        if (!isSslVerificationEnabled())
+            disableSSLVerification();
     }
 
     @Override
@@ -482,5 +483,12 @@ public class AuthServiceImpl implements IAuthService {
             e.printStackTrace();
         }
         HTTPRequest.setDefaultSSLSocketFactory(sc.getSocketFactory());
+    }
+
+    private static boolean isSslVerificationEnabled() {
+        if (!Boolean.getBoolean("ru.agentlab.ssl.verification.enabled")) {
+            return Boolean.parseBoolean(System.getProperty("SSL_VERIFICATION_ENABLED"));
+        }
+        return true;
     }
 }
