@@ -1,5 +1,8 @@
 package ru.agentlab.security.oauth.service.impl;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
+import static java.lang.System.getProperty;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.Socket;
@@ -9,7 +12,6 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
@@ -18,8 +20,6 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509ExtendedTrustManager;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.GET;
@@ -27,13 +27,13 @@ import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Form;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -46,8 +46,7 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static com.google.common.base.Strings.isNullOrEmpty;
-
+import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.nimbusds.oauth2.sdk.AccessTokenResponse;
 import com.nimbusds.oauth2.sdk.AuthorizationCode;
@@ -59,13 +58,9 @@ import com.nimbusds.oauth2.sdk.ParseException;
 import com.nimbusds.oauth2.sdk.RefreshTokenGrant;
 import com.nimbusds.oauth2.sdk.ResourceOwnerPasswordCredentialsGrant;
 import com.nimbusds.oauth2.sdk.Scope;
-import com.nimbusds.oauth2.sdk.TokenIntrospectionRequest;
-import com.nimbusds.oauth2.sdk.TokenIntrospectionResponse;
 import com.nimbusds.oauth2.sdk.TokenRequest;
 import com.nimbusds.oauth2.sdk.TokenResponse;
 import com.nimbusds.oauth2.sdk.TokenRevocationRequest;
-import com.nimbusds.oauth2.sdk.auth.ClientAuthentication;
-import com.nimbusds.oauth2.sdk.auth.ClientSecretBasic;
 import com.nimbusds.oauth2.sdk.auth.ClientSecretPost;
 import com.nimbusds.oauth2.sdk.auth.Secret;
 import com.nimbusds.oauth2.sdk.device.DeviceCode;
@@ -90,25 +85,34 @@ public class AuthServiceImpl implements IAuthService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AuthServiceImpl.class);
 
+    private static final String OAUTH_COOKIE_PATH = System.getProperty("ru.agentlab.security.oauth.cookie.path",
+            getEnv("OAUTH_COOKIE_PATH", String.class, "/"));
+    private static final String OAUTH_COOKIE_DOMAIN = System.getProperty("ru.agentlab.security.oauth.cookie.domain",
+            getEnv("OAUTH_COOKIE_DOMAIN", String.class, null));
+    private static final int OAUTH_COOKIE_EXPIRE_ACCESS_TOKEN = Integer.getInteger(
+            "ru.agentlab.security.oauth.cookie.expire.access_token",
+            getEnv("OAUTH_COOKIE_EXPIRE_ACCESS_TOKEN", Integer.class, 3600));
+    private static final int OAUTH_COOKIE_EXPIRE_REFRESH_TOKEN = Integer.getInteger(
+            "ru.agentlab.security.oauth.cookie.expire.refresh_token",
+            getEnv("OAUTH_COOKIE_EXPIRE_REFRESH_TOKEN", Integer.class, 86400));
+
     private final ClientSecretPost clientAuthPost;
-    private final ClientAuthentication clientAuthBasic;
 
     @Reference
     private IAuthServerProvider authServerProvider;
     @Reference
     private IHttpClientProvider httpClientProvider;
 
-    @Context
-    private HttpServletRequest requestContext;
-
     public AuthServiceImpl() {
-        ClientID clientId = new ClientID(getEnv("CLIENT_ID", "Ynio_EuYVk8j2gn_6nUbIVQbj_Aa"));
-        Secret clientSecret = new Secret(getEnv("CLIENT_SECRET", "fTJGvvfJjUkWvn8R_NY8zXSyYQ0a"));
+        ClientID clientId = new ClientID(getProperty("ru.agentlab.oauth.client.id",
+                getEnv("OAUTH_CLIENT_ID", String.class, "Ynio_EuYVk8j2gn_6nUbIVQbj_Aa")));
+        Secret clientSecret = new Secret(getProperty("ru.agentlab.oauth.client.secret",
+                getEnv("OAUTH_CLIENT_SECRET", String.class, "fTJGvvfJjUkWvn8R_NY8zXSyYQ0a")));
 
         clientAuthPost = new ClientSecretPost(clientId, clientSecret);
-        clientAuthBasic = new ClientSecretBasic(clientId, clientSecret);
 
-        disableSSLVerification();
+        if (!isSslVerificationEnabled())
+            disableSSLVerification();
     }
 
     @Override
@@ -116,13 +120,13 @@ public class AuthServiceImpl implements IAuthService {
     @Path("/token")
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response grantOperation(Form form) {
+    public Response grantOperation(Form form, @CookieParam(OAuthConstants.REFRESH_TOKEN) String refreshTokenCookie) {
         MultivaluedMap<String, String> formParams = form.asMap();
 
         List<String> grantTypes = formParams.get("grant_type");
 
         if (grantTypes == null || grantTypes.isEmpty() || grantTypes.size() > 2) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
+            return Response.status(Status.BAD_REQUEST).build();
         }
 
         GrantType grantType = null;
@@ -131,20 +135,20 @@ public class AuthServiceImpl implements IAuthService {
             grantType = GrantType.parse(grantTypes.get(0));
         } catch (ParseException e) {
             LOGGER.error(e.getMessage(), e);
-            return Response.status(Response.Status.BAD_REQUEST).build();
+            return Response.status(Status.BAD_REQUEST).build();
         }
 
         if (GrantType.PASSWORD.equals(grantType)) {
             return clientCredentialsGrantFlow(form);
         } else if (GrantType.REFRESH_TOKEN.equals(grantType)) {
-            return refreshTokenGrantFlow(form);
+            return refreshTokenGrantFlow(form, refreshTokenCookie);
         } else if (GrantType.DEVICE_CODE.equals(grantType)) {
             return deviceGrantFlow(form);
         } else if (GrantType.AUTHORIZATION_CODE.equals(grantType)) {
             return authorizationCodeGrantFlow(form);
         }
 
-        return Response.status(Response.Status.BAD_REQUEST).build();
+        return Response.status(Status.BAD_REQUEST).build();
     }
 
     @Override
@@ -160,7 +164,7 @@ public class AuthServiceImpl implements IAuthService {
             return Response.ok().entity(info.get()).build();
         }
 
-        return Response.status(Response.Status.BAD_REQUEST).build();
+        return Response.status(Status.BAD_REQUEST).build();
     }
 
     @Override
@@ -176,7 +180,7 @@ public class AuthServiceImpl implements IAuthService {
         String tokenType = formParams.getFirst(OAuthConstants.TOKEN_TYPE_HINT);
 
         if (Strings.isNullOrEmpty(tokenType)) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
+            return Response.status(Status.BAD_REQUEST).build();
         }
 
         String tokenFromForm = formParams.getFirst(OAuthConstants.TOKEN);
@@ -187,7 +191,7 @@ public class AuthServiceImpl implements IAuthService {
         if (OAuthConstants.ACCESS_TOKEN.equals(tokenType)) {
             String accessToken = isNullOrEmpty(accessTokenCookie) ? tokenFromForm : accessTokenCookie;
             if (isNullOrEmpty(accessToken)) {
-                return Response.status(Response.Status.BAD_REQUEST).build();
+                return Response.status(Status.BAD_REQUEST).build();
             } else {
                 token = new BearerAccessToken(accessToken);
                 resetCookie = createTokenCookie(OAuthConstants.ACCESS_TOKEN, "", 0);
@@ -195,13 +199,13 @@ public class AuthServiceImpl implements IAuthService {
         } else if (OAuthConstants.REFRESH_TOKEN.equals(tokenType)) {
             String refreshToken = isNullOrEmpty(refreshTokenCookie) ? tokenFromForm : refreshTokenCookie;
             if (isNullOrEmpty(refreshToken)) {
-                return Response.status(Response.Status.BAD_REQUEST).build();
+                return Response.status(Status.BAD_REQUEST).build();
             } else {
                 token = new RefreshToken(refreshToken);
                 resetCookie = createTokenCookie(OAuthConstants.REFRESH_TOKEN, "", 0);
             }
         } else {
-            return Response.status(Response.Status.BAD_REQUEST).build();
+            return Response.status(Status.BAD_REQUEST).build();
         }
 
         TokenRevocationRequest revokeRequest = new TokenRevocationRequest(authServerProvider.getRevocationEndpointURI(),
@@ -213,10 +217,10 @@ public class AuthServiceImpl implements IAuthService {
                 return Response.ok().cookie(resetCookie).build();
             }
 
-            return Response.status(response.getStatusCode()).entity(response.getContent()).build();
+            return Response.status(response.getStatusCode()).entity(response.getContent()).cookie(resetCookie).build();
         } catch (IOException e) {
             LOGGER.error(e.getMessage(), e);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+            return Response.status(Status.INTERNAL_SERVER_ERROR).cookie(resetCookie).build();
         }
     }
 
@@ -227,102 +231,37 @@ public class AuthServiceImpl implements IAuthService {
     public Response userInfo(@HeaderParam(HttpHeaders.AUTHORIZATION) String authorizationHeader,
             @CookieParam(OAuthConstants.ACCESS_TOKEN) String accessTokenCookie) {
 
-        BearerAccessToken bearerAccessToken = null;
+        Optional<BearerAccessToken> accessToken = Optional.ofNullable(accessTokenCookie)
+                .map(token -> new BearerAccessToken(token))
+                .or(() -> Optional.ofNullable(authorizationHeader).map(token -> {
+                    try {
+                        return BearerAccessToken.parse(token);
+                    } catch (ParseException e) {
+                        LOGGER.error(e.getMessage(), e);
+                        return null;
+                    }
+                }));
 
-        if (!isNullOrEmpty(accessTokenCookie)) {
-            bearerAccessToken = new BearerAccessToken(accessTokenCookie);
-        }
-
-        if (bearerAccessToken == null) {
-            try {
-                bearerAccessToken = BearerAccessToken.parse(authorizationHeader);
-            } catch (ParseException e) {
-                LOGGER.error(e.getMessage(), e);
-            }
-        }
-
-        if (bearerAccessToken == null) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
+        if (accessToken.isEmpty()) {
+            return Response.status(Status.BAD_REQUEST).build();
         }
 
         try {
             HTTPResponse httpResponse = new UserInfoRequest(authServerProvider.getUserInfoEndpointURI(),
-                    bearerAccessToken).toHTTPRequest().send();
+                    accessToken.get()).toHTTPRequest().send();
             UserInfoResponse userInfoResponse = UserInfoResponse.parse(httpResponse);
 
             if (!userInfoResponse.indicatesSuccess()) {
                 ErrorObject errorObject = userInfoResponse.toErrorResponse().getErrorObject();
-                return Response.status(errorObject.getHTTPStatusCode()).entity(errorObject.getDescription()).build();
+                return Response.status(Status.UNAUTHORIZED).entity(errorObject.getDescription()).build();
             }
 
             return Response.ok().entity(userInfoResponse.toSuccessResponse().getUserInfo().toJSONString()).build();
 
         } catch (IOException | ParseException e) {
             LOGGER.error(e.getMessage(), e);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+            return Response.status(Status.INTERNAL_SERVER_ERROR).build();
         }
-    }
-
-    @Override
-    @POST
-    @Path("/introspect")
-    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response introspectToken(Form form, @CookieParam(OAuthConstants.ACCESS_TOKEN) String accessTokenCookie,
-            @CookieParam(OAuthConstants.REFRESH_TOKEN) String refreshTokenCookie) {
-        MultivaluedMap<String, String> formParams = form.asMap();
-
-        List<String> tokenType = formParams.get(OAuthConstants.TOKEN_TYPE_HINT);
-
-        if (tokenType == null || tokenType.isEmpty() || tokenType.size() > 2) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
-        }
-
-        String tokenFromForm = formParams.getFirst(OAuthConstants.TOKEN);
-
-        Token token;
-
-        if (OAuthConstants.ACCESS_TOKEN.equals(tokenType.get(0))) {
-            String accessToken = isNullOrEmpty(accessTokenCookie) ? tokenFromForm : accessTokenCookie;
-            if (isNullOrEmpty(accessToken)) {
-                return Response.status(Response.Status.BAD_REQUEST).build();
-            } else {
-                token = new BearerAccessToken(accessToken);
-            }
-        } else if (OAuthConstants.REFRESH_TOKEN.equals(tokenType.get(0))) {
-            String refreshToken = isNullOrEmpty(refreshTokenCookie) ? tokenFromForm : refreshTokenCookie;
-            if (isNullOrEmpty(refreshToken)) {
-                return Response.status(Response.Status.BAD_REQUEST).build();
-            } else {
-                token = new RefreshToken(refreshToken);
-            }
-        } else {
-            return Response.status(Response.Status.BAD_REQUEST).build();
-        }
-
-        TokenIntrospectionRequest introspectionRequest = new TokenIntrospectionRequest(
-                authServerProvider.getIntrospectionEndpointURI(), clientAuthBasic, token);
-        try {
-            TokenIntrospectionResponse response = TokenIntrospectionResponse
-                    .parse(introspectionRequest.toHTTPRequest().send());
-
-            if (!response.indicatesSuccess()) {
-                ErrorObject errorObject = response.toErrorResponse().getErrorObject();
-                return Response.status(errorObject.getHTTPStatusCode()).entity(errorObject.getDescription()).build();
-            }
-
-            return Response.ok().entity(response.toSuccessResponse().toJSONObject().toJSONString()).build();
-        } catch (IOException | ParseException e) {
-            LOGGER.error(e.getMessage(), e);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-        }
-
-    }
-
-    private Optional<String> getCookieByName(String name) {
-        List<Cookie> cookies = Arrays.asList(Optional.ofNullable(requestContext.getCookies()).orElse(new Cookie[0]));
-        return cookies.stream().filter(cookie -> name.equals(cookie.getName())).findAny()
-                .map(cookie -> cookie.getValue());
     }
 
     private Response clientCredentialsGrantFlow(Form form) {
@@ -330,7 +269,7 @@ public class AuthServiceImpl implements IAuthService {
         String password = form.asMap().getFirst("password");
 
         if (isBadRequest(username, password)) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
+            return Response.status(Status.BAD_REQUEST).build();
         }
 
         AuthorizationGrant passwordGrant = new ResourceOwnerPasswordCredentialsGrant(username, new Secret(password));
@@ -339,12 +278,12 @@ public class AuthServiceImpl implements IAuthService {
 
     }
 
-    private Response refreshTokenGrantFlow(Form form) {
-        String refreshToken = getCookieByName(OAuthConstants.REFRESH_TOKEN)
+    private Response refreshTokenGrantFlow(Form form, String refreshTokenCookie) {
+        String refreshToken = Optional.ofNullable(refreshTokenCookie)
                 .orElse(form.asMap().getFirst(OAuthConstants.REFRESH_TOKEN));
 
         if (isBadRequest(refreshToken)) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
+            return Response.status(Status.BAD_REQUEST).build();
         }
 
         return performAuthorizationGrantOperation(new RefreshTokenGrant(new RefreshToken(refreshToken)), null);
@@ -354,7 +293,7 @@ public class AuthServiceImpl implements IAuthService {
         String deviceCode = form.asMap().getFirst(GrantType.DEVICE_CODE.getValue());
 
         if (isBadRequest(deviceCode)) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
+            return Response.status(Status.BAD_REQUEST).build();
         }
 
         AuthorizationGrant deviceGrant = new DeviceCodeGrant(new DeviceCode(deviceCode));
@@ -368,7 +307,7 @@ public class AuthServiceImpl implements IAuthService {
         String codeChallenge = form.asMap().getFirst("code_challenge");
 
         if (isBadRequest(code, redirectUriRaw)) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
+            return Response.status(Status.BAD_REQUEST).build();
         }
 
         URI redirectUri;
@@ -377,7 +316,7 @@ public class AuthServiceImpl implements IAuthService {
             redirectUri = new URI(redirectUriRaw);
         } catch (URISyntaxException e) {
             LOGGER.error(e.getMessage(), e);
-            return Response.status(Response.Status.BAD_REQUEST).build();
+            return Response.status(Status.BAD_REQUEST).build();
         }
 
         CodeVerifier codeVerifier = codeChallenge != null ? new CodeVerifier(codeChallenge) : null;
@@ -402,7 +341,9 @@ public class AuthServiceImpl implements IAuthService {
         HttpPost httpPost = new HttpPost(authServerProvider.getDeviceAuthorizationEndpointURI());
 
         List<NameValuePair> params = new ArrayList<NameValuePair>();
-        params.add(new BasicNameValuePair("scope", getRequestedScopes(form).toString()));
+        Scope scopes = getRequestedScopes(form);
+        if (!scopes.isEmpty())
+            params.add(new BasicNameValuePair("scope", scopes.toString()));
         params.add(new BasicNameValuePair("client_id", clientAuthPost.getClientID().getValue()));
         params.add(new BasicNameValuePair("client_secret", clientAuthPost.getClientSecret().getValue()));
 
@@ -413,7 +354,7 @@ public class AuthServiceImpl implements IAuthService {
         }
 
         try (CloseableHttpResponse response = httpClientProvider.getClient().execute(httpPost)) {
-            if (response.getStatusLine().getStatusCode() == Response.Status.OK.getStatusCode()) {
+            if (response.getStatusLine().getStatusCode() == Status.OK.getStatusCode()) {
                 String responseString = new BasicResponseHandler().handleResponse(response);
                 return Optional.ofNullable(responseString);
             }
@@ -425,9 +366,18 @@ public class AuthServiceImpl implements IAuthService {
         return Optional.empty();
     }
 
-    private static String getEnv(String key, String defValue) {
-        String value = System.getenv(key);
-        return value != null ? value : defValue;
+    private static <T> T getEnv(String key, Class<T> clazz, T def) {
+        String envValue = System.getenv(key);
+        if (envValue != null) {
+            try {
+                if (Integer.class.equals(clazz) || String.class.equals(clazz)) {
+                    return clazz.getDeclaredConstructor(String.class).newInstance(envValue);
+                }
+            } catch (Exception e) {
+                LOGGER.error(e.getMessage(), e);
+            }
+        }
+        return def;
     }
 
     private Response performAuthorizationGrantOperation(AuthorizationGrant grant, Scope scopes) {
@@ -440,12 +390,11 @@ public class AuthServiceImpl implements IAuthService {
             response = TokenResponse.parse(request.toHTTPRequest().send());
         } catch (IOException | ParseException e) {
             LOGGER.error(e.getMessage(), e);
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+            return Response.status(Status.INTERNAL_SERVER_ERROR).build();
         }
 
         if (!response.indicatesSuccess()) {
             ErrorObject error = response.toErrorResponse().getErrorObject();
-
             return Response.status(error.getHTTPStatusCode()).entity(error.toJSONObject().toString()).build();
         }
 
@@ -454,19 +403,29 @@ public class AuthServiceImpl implements IAuthService {
         String accessToken = successResponse.getTokens().getBearerAccessToken().getValue();
         String refreshToken = successResponse.getTokens().getRefreshToken().getValue();
 
-        // TODO: expire time
-        NewCookie accessTokenCookie = createTokenCookie(OAuthConstants.ACCESS_TOKEN, accessToken, 3600);
-        NewCookie refreshTokenCookie = createTokenCookie(OAuthConstants.REFRESH_TOKEN, refreshToken, 86400);
+        List<NewCookie> cookies = convertTokensToCookies(accessToken, refreshToken);
 
-        return Response.ok().cookie(accessTokenCookie, refreshTokenCookie)
+        return Response.ok().cookie(cookies.stream().toArray(NewCookie[]::new))
                 .entity(successResponse.getTokens().toString()).build();
+    }
+
+    private List<NewCookie> convertTokensToCookies(String accessToken, String refreshToken) {
+        Preconditions.checkArgument(accessToken != null);
+        Preconditions.checkArgument(refreshToken != null);
+
+        NewCookie accessTokenCookie = createTokenCookie(OAuthConstants.ACCESS_TOKEN, accessToken,
+                OAUTH_COOKIE_EXPIRE_ACCESS_TOKEN);
+        NewCookie refreshTokenCookie = createTokenCookie(OAuthConstants.REFRESH_TOKEN, refreshToken,
+                OAUTH_COOKIE_EXPIRE_REFRESH_TOKEN);
+
+        return List.of(accessTokenCookie, refreshTokenCookie);
     }
 
     private NewCookie createTokenCookie(String tokenTypeHint, String token, int maxAge) {
         Calendar expireTime = Calendar.getInstance();
         expireTime.add(Calendar.SECOND, maxAge);
-        return new NewCookie(tokenTypeHint, token, "/", null, NewCookie.DEFAULT_VERSION, null, maxAge,
-                expireTime.getTime(), false, true);
+        return new NewCookie(tokenTypeHint, token, OAUTH_COOKIE_PATH, OAUTH_COOKIE_DOMAIN, NewCookie.DEFAULT_VERSION,
+                null, maxAge, expireTime.getTime(), false, true);
     }
 
     private boolean isBadRequest(String... params) {
@@ -524,5 +483,12 @@ public class AuthServiceImpl implements IAuthService {
             e.printStackTrace();
         }
         HTTPRequest.setDefaultSSLSocketFactory(sc.getSocketFactory());
+    }
+
+    private static boolean isSslVerificationEnabled() {
+        if (!Boolean.getBoolean("ru.agentlab.ssl.verification.enabled")) {
+            return Boolean.parseBoolean(System.getProperty("SSL_VERIFICATION_ENABLED"));
+        }
+        return true;
     }
 }

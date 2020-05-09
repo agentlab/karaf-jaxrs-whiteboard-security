@@ -1,0 +1,8 @@
+{
+    "user_code": "sfvMjn",
+    "device_code": "a397b9fd-5460-4928-b180-4b4373ab1bde",
+    "interval": "5",
+    "verification_uri_complete": "https://localhost:9443/authenticationendpoint/device.do?user_code=sfvMjn",
+    "verification_uri": "https://localhost:9443/authenticationendpoint/device.do",
+    "expires_in": "600"
+}

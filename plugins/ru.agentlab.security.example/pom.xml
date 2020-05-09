@@ -2,7 +2,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-
     <!-- Licensed to the Apache Software Foundation (ASF) under one or more 
         contributor license agreements. See the NOTICE file distributed with this 
         work for additional information regarding copyright ownership. The ASF licenses 
@@ -13,23 +12,16 @@
         under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
         OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
         the specific language governing permissions and limitations under the License. -->
-
     <modelVersion>4.0.0</modelVersion>
-
     <parent>
         <groupId>ru.agentlab.security</groupId>
         <artifactId>ru.agentlab.security.plugins</artifactId>
         <version>0.0.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-
-
     <artifactId>ru.agentlab.security.example</artifactId>
     <name>AgentLab :: REST :: SECURITY :: PLUGINS :: EXAMPLE</name>
-
     <packaging>bundle</packaging>
-
-
     <dependencies>
         <dependency>
             <groupId>org.osgi</groupId>
@@ -43,7 +35,6 @@
             <scope>provided</scope>
         </dependency>
     </dependencies>
-
     <build>
         <plugins>
             <plugin>
@@ -52,13 +43,11 @@
                 <version>${felix.plugin.version}</version>
                 <configuration>
                     <instructions>
-                        <Import-Package>
-                            *
+                        <Import-Package> * 
                         </Import-Package>
                     </instructions>
                 </configuration>
             </plugin>
         </plugins>
     </build>
-
 </project>

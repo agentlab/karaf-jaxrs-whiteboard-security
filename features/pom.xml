@@ -23,9 +23,7 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <!-- <groupId>ru.agentlab</groupId> -->
     <artifactId>ru.agentlab.security.features</artifactId>
-    <!-- <version>0.0.1-SNAPSHOT</version> -->
     <name>AgentLab :: REST :: SECURITY :: FEATURES</name>
     <packaging>pom</packaging>
 

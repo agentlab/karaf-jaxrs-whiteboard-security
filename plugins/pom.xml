@@ -2,7 +2,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-
     <!-- Licensed to the Apache Software Foundation (ASF) under one or more 
         contributor license agreements. See the NOTICE file distributed with this 
         work for additional information regarding copyright ownership. The ASF licenses 
@@ -13,22 +12,16 @@
         under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
         OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
         the specific language governing permissions and limitations under the License. -->
-
     <modelVersion>4.0.0</modelVersion>
-
     <parent>
         <groupId>ru.agentlab.security</groupId>
         <artifactId>ru.agentlab.security.parent</artifactId>
         <version>0.0.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-
-    <!-- <groupId>ru.agentlab</groupId> -->
     <artifactId>ru.agentlab.security.plugins</artifactId>
-    <!-- <version>0.0.1-SNAPSHOT</version> -->
     <name>AgentLab :: REST :: SECURITY :: PLUGINS</name>
     <packaging>pom</packaging>
-
     <modules>
         <module>ru.agentlab.security.example</module>
         <module>ru.agentlab.security.cors</module>
@@ -37,5 +30,4 @@
         <module>ru.agentlab.security.oauth.commons</module>
         <module>ru.agentlab.security.security</module>
     </modules>
-
 </project>

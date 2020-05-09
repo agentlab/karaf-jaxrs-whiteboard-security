@@ -2,7 +2,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-
     <!-- Licensed to the Apache Software Foundation (ASF) under one or more 
         contributor license agreements. See the NOTICE file distributed with this 
         work for additional information regarding copyright ownership. The ASF licenses 
@@ -13,43 +12,33 @@
         under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
         OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
         the specific language governing permissions and limitations under the License. -->
-
     <modelVersion>4.0.0</modelVersion>
-
     <parent>
         <groupId>ru.agentlab.security</groupId>
         <artifactId>ru.agentlab.security.plugins</artifactId>
         <version>0.0.1-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
-
     <artifactId>ru.agentlab.security.jwt</artifactId>
     <name>AgentLab :: REST :: SECURITY :: PLUGINS :: JWT</name>
     <packaging>bundle</packaging>
-
-
-
     <!-- <build> <plugins> <plugin> <groupId>org.apache.felix</groupId> <artifactId>maven-bundle-plugin</artifactId> 
         <configuration> <instructions> <Export-Package>ru.agentlab.jwt.service</Export-Package> 
         </instructions> </configuration> </plugin> </plugins> </build> -->
-
     <dependencies>
         <dependency>
             <groupId>org.osgi</groupId>
             <artifactId>osgi.cmpn</artifactId>
             <version>6.0.0</version>
         </dependency>
-
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
         </dependency>
-
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
@@ -58,25 +47,20 @@
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpcore</artifactId>
         </dependency>
-
         <dependency>
             <groupId>com.nimbusds</groupId>
             <artifactId>nimbus-jose-jwt</artifactId>
         </dependency>
-
         <dependency>
             <groupId>ru.agentlab.security</groupId>
             <artifactId>ru.agentlab.security.oauth.commons</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
         </dependency>
-
     </dependencies>
-
     <build>
         <plugins>
             <plugin>
@@ -85,16 +69,14 @@
                 <version>${felix.plugin.version}</version>
                 <configuration>
                     <instructions>
-                        <Import-Package>
-                            *
+                        <Import-Package> * 
                         </Import-Package>
                         <Private-Package>
-                            ru.agentlab.security.jwt.service.impl
+                            ru.agentlab.security.jwt.service.impl 
                         </Private-Package>
                     </instructions>
                 </configuration>
             </plugin>
         </plugins>
     </build>
-
 </project>

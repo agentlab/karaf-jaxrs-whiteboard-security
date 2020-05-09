@@ -1,8 +1,11 @@
 package ru.agentlab.security.oauth.commons.service.impl;
 
+import static java.lang.System.getProperty;
+
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
+import java.net.URISyntaxException;
 
 import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
@@ -21,11 +24,17 @@ import ru.agentlab.security.oauth.commons.service.IdentityServerUnavailable;
 
 @Component
 public class Wso2Provider implements IAuthServerProvider {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(Wso2Provider.class);
-    private static final String WSO2_PROTOCOL = getEnv("WSO2_PROTOCOL", String.class, "https");
-    private static final String WSO2_HOST = getEnv("WSO2_HOST", String.class, "localhost");
-    private static final int WSO2_PORT = getEnv("WSO2_PORT", Integer.class, 9443);
-    private static final String WSO2_URL = WSO2_PROTOCOL + "://" + WSO2_HOST + ':' + WSO2_PORT;
+
+    //@formatter:off
+    private static final String WSO2_PROTOCOL = getProperty("ru.agentlab.wso2.protocol", getEnv("WSO2_PROTOCOL", String.class, "https"));
+    private static final String WSO2_HOST = getProperty("ru.agentlab.wso2.host", getEnv("WSO2_HOST", String.class, "localhost"));
+    private static final int WSO2_PORT = Integer.getInteger("ru.agentlab.wso2.port", getEnv("WSO2_PORT", Integer.class, 9443));
+    private static final String WSO2_PREFIX = getProperty("ru.agentlab.wso2.prefix", getEnv("WSO2_PREFIX", String.class, ""));
+    //@formatter:on
+
+    private static final String WSO2_URL = WSO2_PROTOCOL + "://" + WSO2_HOST + ':' + WSO2_PORT + WSO2_PREFIX;
 
     private static final String OIDC_DISCOVERY = WSO2_URL + "/oauth2/token";
 
@@ -51,7 +60,14 @@ public class Wso2Provider implements IAuthServerProvider {
 
     @Override
     public URI getDeviceAuthorizationEndpointURI() {
-        return getAuthorizationMetadata().getDeviceAuthorizationEndpointURI();
+        try {
+            return new URI(OIDC_DISCOVERY.replace("token", "device_authorize"));
+        } catch (URISyntaxException e) {
+            LOGGER.error(e.getMessage(), e);
+        }
+        // current version(5.10.0) of WSO2 does not return device_authorization_endpoint
+        // return getAuthorizationMetadata().getDeviceAuthorizationEndpointURI();
+        return null;
     }
 
     @Override
