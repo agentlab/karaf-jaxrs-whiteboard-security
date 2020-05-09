@@ -64,6 +64,6 @@ Or you colud install sub-features one by one:
 |                                                        |                                   |                                |
 | ru.agentlab.wso2.protocol                              |           WSO2_PROTOCOL           |             "https"            |
 | ru.agentlab.wso2.host                                  |             WSO2_HOST             |           "localhost"          |
-| ru.agentlab.wso2.port                                  |             WSO2_PORT             |             "9443"             |
+| ru.agentlab.wso2.port                                  |             WSO2_PORT             |              9443              |
 | ru.agentlab.wso2.prefix                                |            WSO2_PREFIX            |               ""               |
 | ru.agentlab.ssl.verification.enabled                   |      SSL_VERIFICATION_ENABLED     |              false             |
