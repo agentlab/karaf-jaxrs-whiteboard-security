@@ -98,12 +98,21 @@ public class SecurityServiceTest extends SecurityJaxrsTestSupport {
         mapper.registerModule(new Jdk8Module());
         mapper.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
 
-        TokenPayload tokenPayload = mapper.readValue(jwtService.getTokenPayload(VALID_ACCESS_JWT_TOKEN), TokenPayload.class);
+        TokenPayload tokenPayload = mapper.readValue(jwtService.getTokenPayload(VALID_ACCESS_JWT_TOKEN),
+                TokenPayload.class);
 
         securityService.setSubject(VALID_ACCESS_JWT_TOKEN);
 
         Assert.assertEquals(tokenPayload, SecurityUtils.getSubject().getPrincipal());
         Assert.assertTrue(SecurityUtils.getSubject().hasAllRoles(tokenPayload.getGroups()));
+
+        // @formatter:off
+        Assert.assertEquals("testuser", ((TokenPayload) SecurityUtils.getSubject().getPrincipal()).getSub());
+        Assert.assertEquals("First_Name", ((TokenPayload) SecurityUtils.getSubject().getPrincipal()).getGivenName().get());
+        Assert.assertEquals("testuser", ((TokenPayload) SecurityUtils.getSubject().getPrincipal()).getName());
+        Assert.assertEquals("Last_Name", ((TokenPayload) SecurityUtils.getSubject().getPrincipal()).getFamilyName().get());
+        Assert.assertEquals("testuser@mail.ru", ((TokenPayload) SecurityUtils.getSubject().getPrincipal()).getEmail());
+        // @formatter:on
     }
 
 }

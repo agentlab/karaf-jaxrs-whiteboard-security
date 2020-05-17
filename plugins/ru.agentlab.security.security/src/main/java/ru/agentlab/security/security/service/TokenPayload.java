@@ -15,6 +15,14 @@ public class TokenPayload {
 
     private List<String> groups = new ArrayList<>();
 
+    private String name;
+
+    @JsonProperty("given_name")
+    private String givenName;
+
+    @JsonProperty("family_name")
+    private String familyName;
+
     private String email;
 
     public TokenPayload(@JsonProperty("sub") String sub) {
@@ -29,8 +37,32 @@ public class TokenPayload {
         this.groups = groups;
     }
 
-    public Optional<String> getEmail() {
-        return Optional.ofNullable(email);
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Optional<String> getGivenName() {
+        return Optional.ofNullable(givenName);
+    }
+
+    public void setGivenName(String givenName) {
+        this.givenName = givenName;
+    }
+
+    public Optional<String> getFamilyName() {
+        return Optional.ofNullable(familyName);
+    }
+
+    public void setFamilyName(String familyName) {
+        this.familyName = familyName;
+    }
+
+    public String getEmail() {
+        return email;
     }
 
     public void setEmail(String email) {
@@ -42,11 +74,6 @@ public class TokenPayload {
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(email, sub);
-    }
-
-    @Override
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;
@@ -55,8 +82,13 @@ public class TokenPayload {
             return false;
         }
         TokenPayload other = (TokenPayload) obj;
-        return Objects.equals(email, other.email) && Objects.equals(groups, other.groups)
-                && Objects.equals(sub, other.sub);
+        return Objects.equals(email, other.email) && Objects.equals(familyName, other.familyName)
+                && Objects.equals(givenName, other.givenName) && Objects.equals(groups, other.groups)
+                && Objects.equals(name, other.name) && Objects.equals(sub, other.sub);
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(email, familyName, givenName, groups, name, sub);
+    }
 }

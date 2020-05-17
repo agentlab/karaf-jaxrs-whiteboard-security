@@ -311,7 +311,7 @@ public class AuthServiceTest extends SecurityJaxrsTestSupport {
         Response response = authService.grantOperation(form, null);
 
         Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        Assert.assertEquals(readFile(Wso2TestConstants.TOKENS_RESPONSE_FILE), response.getEntity());
+        Assert.assertEquals(readFile(Wso2TestConstants.SUCCESS_TOKEN_RESPONSE_FILE), response.getEntity());
     }
 
     @Test
@@ -381,7 +381,7 @@ public class AuthServiceTest extends SecurityJaxrsTestSupport {
         Response response = authService.grantOperation(form, null);
 
         Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
-        Assert.assertEquals(readFile(Wso2TestConstants.TOKENS_RESPONSE_FILE), response.getEntity());
+        Assert.assertEquals(readFile(Wso2TestConstants.SUCCESS_TOKEN_RESPONSE_FILE), response.getEntity());
     }
 
     // revoke token tests

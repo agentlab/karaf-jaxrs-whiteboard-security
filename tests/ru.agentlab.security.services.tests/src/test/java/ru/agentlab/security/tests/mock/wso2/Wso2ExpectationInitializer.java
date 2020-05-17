@@ -454,7 +454,7 @@ public class Wso2ExpectationInitializer implements PluginExpectationInitializer 
     }
 
     private String getCodeFlowActiveCodeResponse() {
-        return readFileFromResourses(Wso2TestConstants.TOKENS_RESPONSE_FILE);
+        return readFileFromResourses(Wso2TestConstants.SUCCESS_TOKEN_RESPONSE_FILE);
     }
 
     private String getCodeFlowInactiveCodeResponse() {
@@ -470,7 +470,7 @@ public class Wso2ExpectationInitializer implements PluginExpectationInitializer 
     }
 
     private String getDeviceGrantActiveCodeResponseFile() {
-        return readFileFromResourses(Wso2TestConstants.TOKENS_RESPONSE_FILE);
+        return readFileFromResourses(Wso2TestConstants.SUCCESS_TOKEN_RESPONSE_FILE);
     }
 
     private String readFileFromResourses(String fileName) throws UncheckedIOException {
