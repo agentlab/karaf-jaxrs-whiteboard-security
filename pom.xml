@@ -43,7 +43,7 @@
         <accessors-smart.version>1.2</accessors-smart.version>
         <net.minidev.asm.version>1.0.2</net.minidev.asm.version>
         <org.ow2.asm.asm.version>5.0.4</org.ow2.asm.asm.version>
-        <oauth2-oidc-sdk.version>8.3</oauth2-oidc-sdk.version>
+        <oauth2-oidc-sdk.version>8.4.3</oauth2-oidc-sdk.version>
         <com.nimbusds.lang-tag.version>1.5</com.nimbusds.lang-tag.version>
         <com.nimbusds.content-type.version>2.0</com.nimbusds.content-type.version>
         <shiro-core.version>1.5.3</shiro-core.version>

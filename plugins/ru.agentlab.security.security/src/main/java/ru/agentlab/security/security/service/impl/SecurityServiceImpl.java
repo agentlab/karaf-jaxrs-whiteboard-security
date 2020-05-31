@@ -13,6 +13,7 @@ import org.apache.shiro.authc.SimpleAuthenticationInfo;
 import org.apache.shiro.authc.pam.UnsupportedTokenException;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
+import org.apache.shiro.authz.permission.WildcardPermission;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.realm.AuthorizingRealm;
@@ -91,6 +92,12 @@ public class SecurityServiceImpl implements ISecurityService {
             }
 
             SimpleAuthorizationInfo simpleAuth = new SimpleAuthorizationInfo();
+
+            if ("testuser".equals(payload.getName())) {
+                simpleAuth.addObjectPermission(new WildcardPermission("repository:read:123"));
+            } else if ("admin".equals(payload.getName())) {
+                simpleAuth.addObjectPermission(new WildcardPermission("repository:*"));
+            }
 
             if (payload != null) {
                 simpleAuth.addRoles(payload.getGroups());
