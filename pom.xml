@@ -38,7 +38,7 @@
         <jackson.version>2.10.2</jackson.version>
         <apache.commons-lang3.version>3.9</apache.commons-lang3.version>
         <guava.version>23.0</guava.version>
-        <apache.httpclient.version>4.5.11</apache.httpclient.version>
+        <apache.httpclient.version>4.5.13</apache.httpclient.version>
         <apache.httpcore.version>4.4.13</apache.httpcore.version>
         <nimbus-jose-jwt.version>8.5.1</nimbus-jose-jwt.version>
         <tink.version>1.2.2</tink.version>
