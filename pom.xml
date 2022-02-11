@@ -43,7 +43,7 @@
         <nimbus-jose-jwt.version>8.5.1</nimbus-jose-jwt.version>
         <tink.version>1.2.2</tink.version>
         <jcip-annotations.version>1.0</jcip-annotations.version>
-        <json-smart.version>2.3</json-smart.version>
+        <json-smart.version>2.4.5</json-smart.version>
         <accessors-smart.version>1.2</accessors-smart.version>
         <net.minidev.asm.version>1.0.2</net.minidev.asm.version>
         <org.ow2.asm.asm.version>5.0.4</org.ow2.asm.asm.version>
